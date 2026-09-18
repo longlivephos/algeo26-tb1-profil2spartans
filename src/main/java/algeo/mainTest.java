@@ -4,6 +4,8 @@ import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.determinant.Kofaktor;
 import algeo.determinant.OBE;
+import algeo.inverse.Adjoin;
+import algeo.inverse.Augmentasi;
 
 public class mainTest {
     public static void main(String[] args) {
@@ -26,6 +28,16 @@ public class mainTest {
             // 2. Pengujian Metode Ekspansi Kofaktor
             double hasilKofaktor = Kofaktor.hitungKofaktor(m);
             System.out.println("Hasil Kofaktor : " + hasilKofaktor);
+
+            System.out.println("\n--- UJI COBA INVERS ---");
+
+            // 3. Pengujian Invers Metode Adjoin
+            Matrix inversAdjoin = Adjoin.hitungInversAdjoin(m);
+            System.out.println("Hasil Invers Adjoin:\n" + inversAdjoin.toString());
+
+            // 4. Pengujian Invers Metode Augmentasi 
+            Matrix inversAugmentasi = Augmentasi.hitungInversAugmentasi(m);
+            System.out.println("Hasil Invers Augmentasi:\n" + inversAugmentasi.toString());
 
         } catch (MatrixException e) { // Menangkap error dari new Matrix(), OBE.hitungOBE(), Kofaktor.hitungKofaktor()
             System.out.println("Gagal memproses matriks: " + e.getMessage());
