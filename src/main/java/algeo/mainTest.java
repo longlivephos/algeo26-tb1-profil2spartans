@@ -2,31 +2,34 @@ package algeo;
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
+import algeo.determinant.Kofaktor;
 import algeo.determinant.OBE;
 
 public class mainTest {
     public static void main(String[] args) {
-        try {
-            // Pembuatan data array biasa
+        try {//tes dgn matriks 3x3
             double[][] data = {
-                {1, 2},
-                {3, 4}
+                {2, 1, 1},
+                {1, 3, 2},
+                {1, 0, 0}
             };
             
-            // Konstruktor Matrix ini sekarang dijamin aman karena terbungkus try-catch
             Matrix m = new Matrix(data);
 
-            System.out.println("--- UJI COBA DETERMINAN OBE ---");
+            System.out.println("--- UJI COBA DETERMINAN ---");
+            System.out.println("Matriks Input:\n" + m.toString());
             
-            // Perhitungan determinan
-            double hasil = OBE.hitungOBE(m); 
-            System.out.println("Hasil Determinan: " + hasil);
+            // 1. Pengujian Metode OBE
+            double hasilOBE = OBE.hitungOBE(m); 
+            System.out.println("Hasil OBE      : " + hasilOBE);
 
-        } catch (MatrixException e) {
-            // Menangkap error dari new Matrix() maupun dari OBE.hitungOBE()
+            // 2. Pengujian Metode Ekspansi Kofaktor
+            double hasilKofaktor = Kofaktor.hitungKofaktor(m);
+            System.out.println("Hasil Kofaktor : " + hasilKofaktor);
+
+        } catch (MatrixException e) { // Menangkap error dari new Matrix(), OBE.hitungOBE(), Kofaktor.hitungKofaktor()
             System.out.println("Gagal memproses matriks: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            // Menangkap error dari konstruktor Matrix jika ukuran 0
             System.out.println("Ukuran tidak valid: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Terjadi error sistem: " + e.getMessage());
