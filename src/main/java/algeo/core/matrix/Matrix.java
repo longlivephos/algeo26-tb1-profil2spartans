@@ -2,8 +2,8 @@ package algeo.core.matrix;
 import algeo.core.util.NumberFormatter;
 
 public class Matrix {
-    double[][] matriks;
-    int rows, cols;
+    private final double[][] matriks;
+    private final int rows, cols;
 
     public Matrix(int rows, int cols) {
         if (rows <= 0 || cols <= 0) {
