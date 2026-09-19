@@ -2,6 +2,7 @@ package algeo;
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
+import algeo.core.util.NumberFormatter;
 import algeo.determinant.Kofaktor;
 import algeo.determinant.OBE;
 import algeo.inverse.Adjoin;
@@ -23,11 +24,11 @@ public class mainTest {
             
             // 1. Pengujian Metode OBE
             double hasilOBE = OBE.hitungOBE(m); 
-            System.out.println("Hasil OBE      : " + hasilOBE);
+            System.out.println("Hasil OBE      : " + NumberFormatter.round(hasilOBE));
 
             // 2. Pengujian Metode Ekspansi Kofaktor
             double hasilKofaktor = Kofaktor.hitungKofaktor(m);
-            System.out.println("Hasil Kofaktor : " + hasilKofaktor);
+            System.out.println("Hasil Kofaktor : " + NumberFormatter.round(hasilKofaktor));
 
             System.out.println("\n--- UJI COBA INVERS ---");
 
