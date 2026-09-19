@@ -1,17 +1,14 @@
-
 package algeo.inverse;
 
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
-import algeo.core.util.NumberFormatter;
 
 
 public class Augmentasi {
 
-
     /**
-     * Menghitung invers dari suatu matriks persegi menggunakan metode Adjoin (Transpose Kofaktor).
+     * Menghitung invers dari suatu matriks persegi menggunakan metode Augmentasi (OBE / Gauss-Jordan).
      *
      * @param matriks Matriks persegi yang akan dihitung inversnya.
      * @return Matrix matriks baru yang merupakan invers dari matriks input.
@@ -59,7 +56,7 @@ public class Augmentasi {
 
 
             // jika pivot 0, tdk ada invers
-            if (tempMatriks[i][i] == 0) {
+            if (Math.abs(tempMatriks[i][i]) < 1e-9) {
                 throw new MatrixException("Matriks singular (determinan = 0), sehingga tidak memiliki invers");
             }
 
@@ -97,7 +94,7 @@ public class Augmentasi {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 double val = tempMatriks[i][n + j];
-                invers.set(i, j, NumberFormatter.round(val));
+                invers.set(i, j, val);
             }
         }
 
