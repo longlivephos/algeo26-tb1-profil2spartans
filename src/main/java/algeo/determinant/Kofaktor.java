@@ -19,8 +19,6 @@ public class Kofaktor {
         
         //fungsi rekursif untuk hitung determinan
         double det = hitungRekursif(matriks);
-        
-        //mengembalikan hasil dengan pembulatan
         return det;
     }
 
