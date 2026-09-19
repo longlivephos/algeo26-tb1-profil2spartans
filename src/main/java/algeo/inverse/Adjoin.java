@@ -3,20 +3,19 @@ package algeo.inverse;
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
-import algeo.core.util.NumberFormatter;
-import algeo.determinant.Kofaktor;
+import algeo.determinant.OBE;
 
 
 public class Adjoin {
 
-
-    /**
-     * Menghitung invers dari suatu matriks persegi menggunakan metode Augmentasi (OBE / Gauss-Jordan).
+        /**
+     * Menghitung invers dari suatu matriks persegi menggunakan metode Adjoin (Transpose Kofaktor).
      *
      * @param matriks Matriks persegi yang akan dihitung inversnya.
      * @return Matrix matriks baru yang merupakan invers dari matriks input.
      * @throws MatrixException jika matriks bukan persegi atau merupakan matriks singular (determinan = 0).
      */
+
    
     public static Matrix hitungInversAdjoin(Matrix matriks) throws MatrixException {
         // validate
@@ -26,8 +25,8 @@ public class Adjoin {
 
 
         // determinan. jika det = 0, tidak ada invers
-        double det = Kofaktor.hitungKofaktor(matriks);
-        if (det == 0) {
+        double det = OBE.hitungOBE(matriks);
+        if (Math.abs(det) < 1e-9) {
             throw new MatrixException("Matriks singular (determinan = 0), sehingga tidak memiliki invers");
         }
 
@@ -38,7 +37,7 @@ public class Adjoin {
 
         // basis matrix 1x1
         if (n == 1) {
-            invers.set(0, 0, NumberFormatter.round(1.0 / matriks.get(0, 0)));
+            invers.set(0, 0, 1.0 / matriks.get(0, 0));
             return invers;
         }
 
@@ -50,7 +49,7 @@ public class Adjoin {
                 Matrix subMatriks = matriks.getMinor(i, j);
                
                 // determinan dari minor
-                double detMinor = Kofaktor.hitungKofaktor(subMatriks);
+                double detMinor = OBE.hitungOBE(subMatriks);
                
                 // sign
                 int tanda = ((i + j) % 2 == 0) ? 1 : -1;
@@ -60,7 +59,7 @@ public class Adjoin {
                
                 // transpose untuk dapat adjoin
                 double nilaiInvers = kofaktorVal / det;
-                invers.set(j, i, NumberFormatter.round(nilaiInvers));
+                invers.set(j, i, nilaiInvers);
             }
         }
 
@@ -68,7 +67,3 @@ public class Adjoin {
         return invers;
     }
 }
-
-
-
-
