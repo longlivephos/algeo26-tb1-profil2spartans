@@ -2,9 +2,17 @@ package algeo.determinant;
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
-import algeo.core.util.NumberFormatter;
 
 public class OBE { 
+    /**
+     * Menghitung nilai determinan dari sebuah matriks menggunakan metode Operasi Baris Elementer (OBE).
+     * Nilai yang dikembalikan adalah nilai mentah (tanpa pembulatan) untuk menjaga presisi 
+     * jika digunakan pada perhitungan lanjutan seperti Invers atau Aturan Cramer.
+     *
+     * @param matriks Objek matriks persegi yang akan dihitung determinannya.
+     * @return Nilai determinan matriks murni dalam tipe double.
+     * @throws MatrixException Jika ukuran matriks input tidak berbentuk persegi.
+     */
 
     public static double hitungOBE(Matrix matriks) throws MatrixException {
         if (!matriks.isSquare()) {
@@ -49,11 +57,12 @@ public class OBE {
                 } 
             }
         }
-
+        
+        // Determinan adalah hasil kali elemen-elemen diagonal utama
         for (int i = 0; i < n; i++) {
             det *= tempMatriks[i][i];
         }
 
-        return NumberFormatter.round(det);
+        return det;
     }   
 }

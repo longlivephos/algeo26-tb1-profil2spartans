@@ -2,9 +2,15 @@ package algeo.determinant;
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
-import algeo.core.util.NumberFormatter;
 
 public class Kofaktor {
+    /**
+     * Menghitung nilai determinan dari sebuah matriks menggunakan Ekspansi Kofaktor.
+     * Nilai yang dikembalikan adalah nilai mentah (tanpa pembulatan) untuk menjaga akurasi dan presisi pada perhitungan lanjutan seperti Invers atau Aturan Cramer.
+     * @param matriks Objek matriks persegi yang akan dihitung determinannya.
+     * @return Nilai determinan matriks murni dalam tipe double.
+     * @throws MatrixException Jika ukuran matriks input tidak berbentuk persegi.
+     */
     public static double hitungKofaktor(Matrix matriks) throws MatrixException {
         // Validasi matriks persegi
         if (!matriks.isSquare()) {
@@ -15,10 +21,12 @@ public class Kofaktor {
         double det = hitungRekursif(matriks);
         
         //mengembalikan hasil dengan pembulatan
-        return NumberFormatter.round(det);
+        return det;
     }
 
     // Fungsi internal memecah matriks secara rekursif
+    // @param m Matriks atau sub-matriks yang sedang diproses.
+    // @return Nilai determinan dari matriks input.
     private static double hitungRekursif(Matrix m) {
         int n = m.getRows();
         
