@@ -7,6 +7,8 @@ import algeo.determinant.Kofaktor;
 import algeo.determinant.OBE;
 import algeo.inverse.Adjoin;
 import algeo.inverse.Augmentasi;
+import algeo.inverse.InverseResult;
+import algeo.inverse.InverseSolverOutput;
 
 public class mainTest {
     public static void main(String[] args) {
@@ -33,12 +35,28 @@ public class mainTest {
             System.out.println("\n--- UJI COBA INVERS ---");
 
             // 3. Pengujian Invers Metode Adjoin
-            Matrix inversAdjoin = Adjoin.hitungInversAdjoin(m);
-            System.out.println("Hasil Invers Adjoin:\n" + inversAdjoin.toString());
+            InverseSolverOutput outputAdjoin = Adjoin.hitungInversAdjoin(m);
+            System.out.println("Langkah-Langkah Adjoin:");
+            for (String step : outputAdjoin.getSteps()) {
+                System.out.println("- " + step);
+            }
+            if (outputAdjoin.getResult().getType() == InverseResult.ResultType.HAS_INVERSE) {
+                System.out.println("Hasil Invers Adjoin:\n" + outputAdjoin.getResult().getInverse().toString());
+            } else {
+                System.out.println(outputAdjoin.getResult().getErrorMessage());
+            }
 
             // 4. Pengujian Invers Metode Augmentasi 
-            Matrix inversAugmentasi = Augmentasi.hitungInversAugmentasi(m);
-            System.out.println("Hasil Invers Augmentasi:\n" + inversAugmentasi.toString());
+            InverseSolverOutput outputAugmentasi = Augmentasi.hitungInversAugmentasi(m);
+            System.out.println("\nLangkah-Langkah Augmentasi:");
+            for (String step : outputAugmentasi.getSteps()) {
+                System.out.println("- " + step);
+            }
+            if (outputAugmentasi.getResult().getType() == InverseResult.ResultType.HAS_INVERSE) {
+                System.out.println("Hasil Invers Augmentasi:\n" + outputAugmentasi.getResult().getInverse().toString());
+            } else {
+                System.out.println(outputAugmentasi.getResult().getErrorMessage());
+            }
 
         } catch (MatrixException e) { // Menangkap error dari new Matrix(), OBE.hitungOBE(), Kofaktor.hitungKofaktor()
             System.out.println("Gagal memproses matriks: " + e.getMessage());
