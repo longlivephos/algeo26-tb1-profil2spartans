@@ -7,7 +7,7 @@ import algeo.core.matrix.MatrixException;
 import algeo.core.util.NumberFormatter;
 
 public class GaussJordan {
-    private static final double EPS = 1e-9;
+    private static final double EPS = 1e-12;
 
     /**
      * Menyelesaikan SPL dengan eliminasi Gauss-Jordan
@@ -83,6 +83,9 @@ public class GaussJordan {
             baris++;
         }
         int rank = baris;
+        if (catat) {
+            steps.add("Matriks eselon baris tereduksi:\n" + m);
+        }
 
         for (int i = rank; i < rows; i++) {
             if (Math.abs(m.get(i, n)) > EPS) {
@@ -94,7 +97,7 @@ public class GaussJordan {
         if (rank == n) {
             double[] x = new double[n];
             for (int i = 0; i < n; i++) {
-                x[i] = NumberFormatter.round(m.get(i, n));
+                x[i] = m.get(i, n);
             }
             steps.add("Matriks sudah berbentuk eselon baris tereduksi, solusi tunggal dibaca langsung.");
             return new SolverOutput(SPLResult.unique(x), steps);
@@ -139,14 +142,16 @@ public class GaussJordan {
             for (int c = 0; c < bebas; c++) {
                 double koef = NumberFormatter.round(x[j][c]);
                 if (koef == 0) continue;
+                String angka = "";
+                if (Math.abs(koef) != 1) angka = Math.abs(koef) + "*";
                 if (adaSuku) {
                     if (koef < 0) sb.append(" - ");
                     else sb.append(" + ");
-                    sb.append(Math.abs(koef));
                 } else {
-                    sb.append(" ").append(koef);
+                    if (koef < 0) sb.append(" -");
+                    else sb.append(" ");
                 }
-                sb.append("*t").append(c + 1);
+                sb.append(angka).append("t").append(c + 1);
                 adaSuku = true;
             }
             if (!adaSuku) sb.append(" 0");
@@ -155,9 +160,10 @@ public class GaussJordan {
 
         sb.append("dengan ");
         for (int c = 0; c < bebas; c++) {
-            sb.append("t").append(c + 1).append(" = x").append(kolomBebas[c] + 1).append(" ");
+            if (c > 0) sb.append(", ");
+            sb.append("t").append(c + 1).append(" = x").append(kolomBebas[c] + 1);
         }
-        sb.append("(bilangan real bebas)");
+        sb.append(" (bilangan real bebas)");
         return sb.toString();
     }
 }

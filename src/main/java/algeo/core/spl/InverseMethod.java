@@ -8,7 +8,7 @@ import algeo.core.matrix.MatrixException;
 import algeo.core.util.NumberFormatter;
 
 public class InverseMethod {
-    private static final double EPS = 1e-9;
+    private static final double EPS = 1e-12;
 
     /**
      * Menyelesaikan SPL dengan metode matriks balikan (x = A^-1 b)
@@ -45,7 +45,7 @@ public class InverseMethod {
         Matrix hasil = inv.multiply(b);
         double[] x = new double[n];
         for (int i = 0; i < n; i++) {
-            x[i] = NumberFormatter.round(hasil.get(i, 0));
+            x[i] = hasil.get(i, 0);
         }
         steps.add("x = A^-1 * b, solusi tunggal ditemukan.");
         return new SolverOutput(SPLResult.unique(x), steps);
