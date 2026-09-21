@@ -7,7 +7,7 @@ import algeo.core.matrix.MatrixException;
 import algeo.core.util.NumberFormatter;
 
 public class GaussEliminationSolver {
-    private static final double EPS = 1e-9;
+    private static final double EPS = 1e-12;
     /**
      * Menyelesaikan SPL dengan eliminasi Gauss
      * @param augmented matriks augmented [A|b]
@@ -55,8 +55,17 @@ public class GaussEliminationSolver {
                 }
             }
 
+            double pivot = m.get(baris, kol);
+            for (int j = kol; j <= n; j++) {
+                m.set(baris, j, m.get(baris, j) / pivot);
+            }
+            m.set(baris, kol, 1);
+            if (catat) {
+                steps.add("Baris " + (baris + 1) + " = Baris " + (baris + 1) + " / " + NumberFormatter.round(pivot) + ":\n" + m);
+            }
+
             for (int i = baris + 1; i < rows; i++) {
-                double faktor = m.get(i, kol) / m.get(baris, kol);
+                double faktor = m.get(i, kol);
                 if (faktor == 0) continue;
                 for (int j = kol; j <= n; j++) {
                     m.set(i, j, m.get(i, j) - faktor * m.get(baris, j));
@@ -72,6 +81,9 @@ public class GaussEliminationSolver {
             baris++;
         }
         int rank = baris;
+        if (catat) {
+            steps.add("Matriks eselon baris:\n" + m);
+        }
 
         for (int i = rank; i < rows; i++) {
             if (Math.abs(m.get(i, n)) > EPS) {
@@ -87,10 +99,10 @@ public class GaussEliminationSolver {
                 for (int j = i + 1; j < n; j++) {
                     sisa = sisa - m.get(i, j) * x[j];
                 }
-                x[i] = sisa / m.get(i, i);
-            }
-            for (int i = 0; i < n; i++) {
-                x[i] = NumberFormatter.round(x[i]);
+                x[i] = sisa;
+                if (catat) {
+                    steps.add("x" + (i + 1) + " = " + NumberFormatter.round(x[i]));
+                }
             }
             steps.add("Substitusi mundur selesai, solusi tunggal ditemukan.");
             return new SolverOutput(SPLResult.unique(x), steps);
@@ -120,7 +132,7 @@ public class GaussEliminationSolver {
                 for (int j = p + 1; j < n; j++) {
                     nilai = nilai - m.get(i, j) * x[j][c];
                 }
-                x[p][c] = nilai / m.get(i, p);
+                x[p][c] = nilai;
             }
         }
 
@@ -137,14 +149,16 @@ public class GaussEliminationSolver {
             for (int c = 0; c < bebas; c++) {
                 double koef = NumberFormatter.round(x[j][c]);
                 if (koef == 0) continue;
+                String angka = "";
+                if (Math.abs(koef) != 1) angka = Math.abs(koef) + "*";
                 if (adaSuku) {
                     if (koef < 0) sb.append(" - ");
                     else sb.append(" + ");
-                    sb.append(Math.abs(koef));
                 } else {
-                    sb.append(" ").append(koef);
+                    if (koef < 0) sb.append(" -");
+                    else sb.append(" ");
                 }
-                sb.append("*t").append(c + 1);
+                sb.append(angka).append("t").append(c + 1);
                 adaSuku = true;
             }
             if (!adaSuku) sb.append(" 0");
@@ -155,11 +169,12 @@ public class GaussEliminationSolver {
         k = 0;
         for (int j = 0; j < n; j++) {
             if (!adaPivot[j]) {
+                if (k > 0) sb.append(", ");
                 k++;
-                sb.append("t").append(k).append(" = x").append(j + 1).append(" ");
+                sb.append("t").append(k).append(" = x").append(j + 1);
             }
         }
-        sb.append("(bilangan real bebas)");
+        sb.append(" (bilangan real bebas)");
         return sb.toString();
     }
 }
