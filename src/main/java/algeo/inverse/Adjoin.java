@@ -45,7 +45,7 @@ public class Adjoin {
 
             // basis matrix 1x1
             if (n == 1) {
-                invers.set(0, 0, NumberFormatter.round(1.0 / matriks.get(0, 0)));
+                invers.set(0, 0, 1.0 / matriks.get(0, 0));
                 steps.add("Matriks berukuran 1x1, invers bernilai 1.");
                 return new InverseSolverOutput(InverseResult.exists(invers), steps);
             }
@@ -68,7 +68,7 @@ public class Adjoin {
                     int tanda = ((i + j) % 2 == 0) ? 1 : -1;
                     
                     // nilai kofaktor
-                    double kofaktorVal = NumberFormatter.round(tanda * detMinor);
+                    double kofaktorVal = tanda * detMinor;
                     kofaktorMat.set(i, j, kofaktorVal);
                     
                     // transpose untuk dapat adjoin
@@ -84,7 +84,7 @@ public class Adjoin {
 
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    double nilaiInvers = NumberFormatter.round(adjoinMat.get(i, j) / det);
+                    double nilaiInvers = adjoinMat.get(i, j) / det;
                     invers.set(i, j, nilaiInvers);
                 }
             }

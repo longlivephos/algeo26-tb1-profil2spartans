@@ -105,7 +105,7 @@ public class Augmentasi {
         Matrix invers = new Matrix(n, n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                double val = NumberFormatter.round(tempMatriks[i][n + j]);
+                double val = tempMatriks[i][n + j];
                 invers.set(i, j, val);
             }
         }
