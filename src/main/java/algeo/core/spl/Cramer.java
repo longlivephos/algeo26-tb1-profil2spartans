@@ -9,12 +9,12 @@ import algeo.core.util.NumberFormatter;
 import algeo.determinant.OBE;
 
 public class Cramer {
-    private static final double EPS = 1e-9;
+    private static final double EPS = 1e-12;
 
     /**
      * Menyelesaikan SPL dengan kaidah Cramer
      * @param augmented matriks augmented [A|b], A harus persegi
-     * @return hasil SPL beserta langkah-langkahnya
+     * @return hasil SPL beserta langkah-langkahnya (solusi belum dibulatkan)
      * @throws MatrixException jika A tidak persegi atau det(A) = 0
      */
     public SolverOutput solve(Matrix augmented) throws MatrixException {
@@ -34,7 +34,7 @@ public class Cramer {
         steps.add("det(A) = " + NumberFormatter.round(detA));
 
         if (Math.abs(detA) < EPS) {
-            throw new MatrixException("Kaidah Cramer tidak bisa dipakai karena det(A) = 0");
+            throw new MatrixException("Kaidah Cramer tidak bisa dipakai karena det(A) = 0 atau terlalu dekat ke 0");
         }
 
         double[] x = new double[n];
@@ -52,9 +52,6 @@ public class Cramer {
             steps.add("det(A" + (k + 1) + ") = " + NumberFormatter.round(detAk) + ", x" + (k + 1) + " = det(A" + (k + 1) + ") / det(A) = " + NumberFormatter.round(x[k]));
         }
 
-        for (int i = 0; i < n; i++) {
-            x[i] = NumberFormatter.round(x[i]);
-        }
         return new SolverOutput(SPLResult.unique(x), steps);
     }
 }
