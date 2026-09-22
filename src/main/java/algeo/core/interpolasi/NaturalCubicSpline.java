@@ -28,7 +28,8 @@ public class NaturalCubicSpline {
                 steps
             );
         }
-        // n = # dari interpolating spline (selalu 1 less than the number of data points)
+
+        // n = # dari interpolating spline (always 1 less than the number of data points)
         int n = x.length-1;
         steps.add("Jumlah titik data = " + (n+1) + ", sehingga terbentuk " + n + " segmen polinomial kubik");
 
@@ -96,12 +97,12 @@ public class NaturalCubicSpline {
 
             // hitung koefisien a, b, d tiap segmen
             steps.add("Hitung koefisien a, b, d per segmen");
-            double[][] koefisien = new double[n][4];
+            double[][] koefisien = new double[n][4]; // biat matriks n x 4 utk simpen koef
 
             for (int i = 0; i < n; i++) {
-                double a = y[i];
-                double b = (y[i + 1] - y[i]) / h[i] - h[i] * (2.0 * c[i] + c[i + 1]) / 3.0;
-                double d = (c[i + 1] - c[i]) / (3.0 * h[i]);
+                double a = y[i]; // nilai a[i] sama dengan y[i] karena x=x
+                double b = (y[i + 1] - y[i]) / h[i] - h[i] * (2.0 * c[i] + c[i + 1]) / 3.0; // kemiringan, syarat kontinuitas turunan kedua
+                double d = (c[i + 1] - c[i]) / (3.0 * h[i]); // seberapa cepat kelengkungan berubah, syarat kurva segmen harus menyentuh titik ujung kanan
 
                 koefisien[i][0] = a;
                 koefisien[i][1] = b;
