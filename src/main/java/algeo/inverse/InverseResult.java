@@ -44,4 +44,3 @@ public class InverseResult {
     /** @return pesan alasan, null kalau punya invers */
     public String getErrorMessage() { return errorMessage; }
 }
-
