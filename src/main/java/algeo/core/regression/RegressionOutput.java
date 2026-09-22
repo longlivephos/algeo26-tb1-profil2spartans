@@ -44,16 +44,18 @@ public class RegressionOutput {
         boolean adaSuku = false;
 
         for (int j = 0; j < koefisien.length; j++) {
-            double koef = NumberFormatter.round(koefisien[j]);
+            double koef = koefisien[j];
             if (koef == 0) continue;
-
+            String angka = NumberFormatter.teks(Math.abs(koef));
+            if (j > 0 && angka.equals("1")) angka = "";
+            
             if (adaSuku) {
                 if (koef < 0) sb.append(" - ");
                 else sb.append(" + ");
-                sb.append(Math.abs(koef));
             } else {
-                sb.append(" ").append(koef);
+                sb.append(koef < 0 ? " -" : " ");
             }
+            sb.append(angka);
 
             if (j == 1) {
                 sb.append("x");
@@ -61,8 +63,8 @@ public class RegressionOutput {
                 sb.append("x^").append(j);
             } else if (j > derajat) {
                 double k = knot[j - derajat - 1];
-                if (k < 0) sb.append("(x + ").append(NumberFormatter.round(-k)).append(")_+");
-                else sb.append("(x - ").append(NumberFormatter.round(k)).append(")_+");
+                if (k < 0) sb.append("(x + ").append(NumberFormatter.teks(-k)).append(")_+");
+                else sb.append("(x - ").append(NumberFormatter.teks(k)).append(")_+");
                 if (derajat > 1) sb.append("^").append(derajat);
             }
             adaSuku = true;
