@@ -4,7 +4,7 @@ public class InterpolasiResult {
     public enum ResultType { SUCCESS, FAILED }
 
     private final ResultType type;
-    private double[][] koefisien; // Ukuran [n][4] -> [a, b, c, d] per segmen
+    private double[][] koefisien; 
     private double[] xData;
     private double[] yData;
     private String errorMessage;
@@ -14,11 +14,11 @@ public class InterpolasiResult {
     }
 
     /**
-     * Membuat objek hasil jika interpolasi berhasil.
+     * membuat objek hasil jika interpolasi berhasil.
      * 
-     * @param koefisien Matriks koefisien [n][4]
-     * @param xData Array x asal
-     * @param yData Array y asal
+     * @param koefisien matriks koefisien [n][4]
+     * @param xData array x asal
+     * @param yData array y asal
      * @return InterpolasiResult bertipe SUCCESS
      */
     public static InterpolasiResult success(double[][] koefisien, double[] xData, double[] yData) {
@@ -30,9 +30,9 @@ public class InterpolasiResult {
     }
 
     /**
-     * Membuat objek hasil jika interpolasi gagal.
+     * membuat objek hasil jika interpolasi gagal.
      * 
-     * @param errorMessage Pesan penyebab kegagalan
+     * @param errorMessage pesan penyebab kegagalan
      * @return InterpolasiResult bertipe FAILED
      */
     public static InterpolasiResult failed(String errorMessage) {

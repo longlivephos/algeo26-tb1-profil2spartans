@@ -87,6 +87,13 @@ public class NaturalCubicSpline {
                 );
             }   
 
+            // nilai turunan kedua pada tiap knot
+            steps.add("Nilai turunan kedua pada setiap knot: ");
+            for (int i = 0; i <= n; i++) {
+                double turunanKedua = 2.0 * c[i];
+                steps.add(String.format("  Knot x_%d (%.2f) -> S''(x) = 2 * c_%d = %.6f", i, x[i], i, turunanKedua));
+            }
+
             // hitung koefisien a, b, d tiap segmen
             steps.add("Hitung koefisien a, b, d per segmen");
             double[][] koefisien = new double[n][4];

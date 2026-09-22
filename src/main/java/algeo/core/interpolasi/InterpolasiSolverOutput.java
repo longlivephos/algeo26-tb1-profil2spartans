@@ -7,9 +7,10 @@ public class InterpolasiSolverOutput {
     private final List<String> steps;
 
     /**
-     * @param result Hasil perhitungan interpolasi
-     * @param steps Daftar catatan langkah-langkah pengerjaan
+     * @param result hasil perhitungan
+     * @param steps langkah-langkah perhitungan
      */
+    
     public InterpolasiSolverOutput(InterpolasiResult result, List<String> steps) {
         this.result = result;
         this.steps = steps;
