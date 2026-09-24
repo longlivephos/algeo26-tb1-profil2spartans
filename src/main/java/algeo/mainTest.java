@@ -1,5 +1,8 @@
 package algeo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.util.NumberFormatter;
@@ -12,7 +15,8 @@ import algeo.inverse.InverseSolverOutput;
 
 public class mainTest {
     public static void main(String[] args) {
-        try {//tes dgn matriks 3x3
+        try {
+            // tes dgn matriks 3x3
             double[][] data = {
                 {2, 1, 1},
                 {1, 3, 2},
@@ -25,14 +29,26 @@ public class mainTest {
             System.out.println("Matriks Input:\n" + m.toString());
             
             // 1. Pengujian Metode OBE
-            double hasilOBE = OBE.hitungOBE(m); 
-            System.out.println("Hasil OBE      : " + NumberFormatter.round(hasilOBE));
+            List<String> langkahOBE = new ArrayList<>();
+            double hasilOBE = OBE.hitungOBE(m, langkahOBE); 
+            
+            System.out.println("Langkah-Langkah OBE:");
+            for (String langkah : langkahOBE) {
+                System.out.println("- " + langkah);
+            }
+            System.out.println("Hasil OBE      : " + NumberFormatter.round(hasilOBE) + "\n");
 
             // 2. Pengujian Metode Ekspansi Kofaktor
-            double hasilKofaktor = Kofaktor.hitungKofaktor(m);
-            System.out.println("Hasil Kofaktor : " + NumberFormatter.round(hasilKofaktor));
+            List<String> langkahKofaktor = new ArrayList<>();
+            double hasilKofaktor = Kofaktor.hitungKofaktor(m, langkahKofaktor);
+            
+            System.out.println("Langkah-Langkah Kofaktor:");
+            for (String langkah : langkahKofaktor) {
+                System.out.println("- " + langkah);
+            }
+            System.out.println("Hasil Kofaktor : " + NumberFormatter.round(hasilKofaktor) + "\n");
 
-            System.out.println("\n--- UJI COBA INVERS ---");
+            System.out.println("--- UJI COBA INVERS ---");
 
             // 3. Pengujian Invers Metode Adjoin
             InverseSolverOutput outputAdjoin = Adjoin.hitungInversAdjoin(m);
@@ -46,7 +62,7 @@ public class mainTest {
                 System.out.println(outputAdjoin.getResult().getErrorMessage());
             }
 
-            // 4. Pengujian Invers Metode Augmentasi 
+            // 4. Pengujian Invers Metode Augmentasi
             InverseSolverOutput outputAugmentasi = Augmentasi.hitungInversAugmentasi(m);
             System.out.println("\nLangkah-Langkah Augmentasi:");
             for (String step : outputAugmentasi.getSteps()) {
@@ -58,7 +74,7 @@ public class mainTest {
                 System.out.println(outputAugmentasi.getResult().getErrorMessage());
             }
 
-        } catch (MatrixException e) { // Menangkap error dari new Matrix(), OBE.hitungOBE(), Kofaktor.hitungKofaktor()
+        } catch (MatrixException e) { 
             System.out.println("Gagal memproses matriks: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.out.println("Ukuran tidak valid: " + e.getMessage());
