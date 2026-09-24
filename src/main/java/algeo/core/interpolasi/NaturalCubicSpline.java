@@ -40,6 +40,10 @@ public class NaturalCubicSpline {
             double[] h = new double[n];
             for(int i = 0; i < n; i++){
                 h[i] = x[i+1] - x[i];
+                if (h[i] <= 0){
+                    steps.add("Nilai x harus terurut naik");
+                    return new InterpolasiSolverOutput(InterpolasiResult.failed("Data x tidak terurut naik"), steps);
+                }
                 steps.add(String.format("h[%d] = %.4f", i, h[i]));
             }
 
