@@ -29,6 +29,15 @@ public class NaturalCubicSpline {
             );
         }
 
+        
+        if (x.length > 10) {
+            steps.add("Jumlah titik data melebihi batas maks (10 titik");
+            return new InterpolasiSolverOutput(
+                InterpolasiResult.failed("Titik data terlalu banyak, maks 10 titik"),
+                steps
+            );
+        }
+
         // n = # dari interpolating spline (always 1 less than the number of data points)
         int n = x.length-1;
         steps.add("Jumlah titik data = " + (n+1) + ", sehingga terbentuk " + n + " segmen polinomial kubik");
