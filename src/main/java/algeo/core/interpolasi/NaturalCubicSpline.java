@@ -2,6 +2,7 @@ package algeo.core.interpolasi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.spl.GaussJordan;
@@ -53,7 +54,7 @@ public class NaturalCubicSpline {
                     steps.add("Nilai x harus terurut naik");
                     return new InterpolasiSolverOutput(InterpolasiResult.failed("Data x tidak terurut naik"), steps);
                 }
-                steps.add(String.format("h[%d] = %.4f", i, h[i]));
+                steps.add(String.format(Locale.US, "h[%d] = %.4f", i, h[i]));
             }
 
             //  menyederhanakan 4n variabel jadi 1 sistem persamaan tridiagonal
@@ -82,7 +83,7 @@ public class NaturalCubicSpline {
                 double rhs = 3.0 * ((y[i+1] - y[i])/h[i] - (y[i] - y[i-1])/h[i-1]);
                 aug.set(i, n+1, rhs);
 
-                steps.add(String.format("Persamaan baris-%d: %.4f*c_%d + %.4f*c_%d + %.4f*c_%d = %.4f",
+                steps.add(String.format(Locale.US, "Persamaan baris-%d: %.4f*c_%d + %.4f*c_%d + %.4f*c_%d = %.4f",
                             (i + 1), h[i - 1], (i - 1), 2.0 * (h[i - 1] + h[i]), i, h[i], (i + 1), rhs));
             }
 
@@ -105,7 +106,7 @@ public class NaturalCubicSpline {
             steps.add("Nilai turunan kedua pada setiap knot: ");
             for (int i = 0; i <= n; i++) {
                 double turunanKedua = 2.0 * c[i];
-                steps.add(String.format("  Knot x_%d (%.2f) -> S''(x) = 2 * c_%d = %.6f", i, x[i], i, turunanKedua));
+                steps.add(String.format(Locale.US, "  Knot x_%d (%.2f) -> S''(x) = 2 * c_%d = %.6f", i, x[i], i, turunanKedua));
             }
 
             // hitung koefisien a, b, d tiap segmen
@@ -122,12 +123,12 @@ public class NaturalCubicSpline {
                 koefisien[i][2] = c[i];
                 koefisien[i][3] = d;
 
-                steps.add(String.format("Segmen %d [%.2f <= x <= %.2f]:", (i + 1), x[i], x[i + 1]));
-                steps.add(String.format("  a_%d = %.6f", i, a));
-                steps.add(String.format("  b_%d = %.6f", i, b));
-                steps.add(String.format("  c_%d = %.6f", i, c[i]));
-                steps.add(String.format("  d_%d = %.6f", i, d));
-                steps.add(String.format("  S_%d(x) = %.4f + %.4f*(x - %.2f) + %.4f*(x - %.2f)^2 + %.4f*(x - %.2f)^3",
+                steps.add(String.format(Locale.US, "Segmen %d [%.2f <= x <= %.2f]:", (i + 1), x[i], x[i + 1]));
+                steps.add(String.format(Locale.US, "  a_%d = %.6f", i, a));
+                steps.add(String.format(Locale.US, "  b_%d = %.6f", i, b));
+                steps.add(String.format(Locale.US, "  c_%d = %.6f", i, c[i]));
+                steps.add(String.format(Locale.US, "  d_%d = %.6f", i, d));
+                steps.add(String.format(Locale.US, "  S_%d(x) = %.4f + %.4f*(x - %.2f) + %.4f*(x - %.2f)^2 + %.4f*(x - %.2f)^3",
                         i, a, b, x[i], c[i], x[i], d, x[i]));
             }
 
@@ -170,5 +171,13 @@ public class NaturalCubicSpline {
         double d = koefisien[i][3];
 
         return a + (b * dx) + (c * dx * dx) + (d * dx * dx * dx);
+    }
+
+    // mengecek apakah nilai xVal berada di dalam domain [x[0], x[n]]
+    public static boolean diDalamDomain(double[] x, double xVal) {
+        if (x == null || x.length == 0) {
+            return false;
+        }
+        return xVal >= x[0] && xVal <= x[x.length - 1];
     }
 }
