@@ -2,6 +2,7 @@ package algeo.core.interpolasi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.spl.GaussJordan;
@@ -29,6 +30,15 @@ public class NaturalCubicSpline {
             );
         }
 
+        
+        if (x.length > 10) {
+            steps.add("Jumlah titik data melebihi batas maks (10 titik");
+            return new InterpolasiSolverOutput(
+                InterpolasiResult.failed("Titik data terlalu banyak, maks 10 titik"),
+                steps
+            );
+        }
+
         // n = # dari interpolating spline (always 1 less than the number of data points)
         int n = x.length-1;
         steps.add("Jumlah titik data = " + (n+1) + ", sehingga terbentuk " + n + " segmen polinomial kubik");
@@ -40,7 +50,11 @@ public class NaturalCubicSpline {
             double[] h = new double[n];
             for(int i = 0; i < n; i++){
                 h[i] = x[i+1] - x[i];
-                steps.add(String.format("h[%d] = %.4f", i, h[i]));
+                if (h[i] <= 0){
+                    steps.add("Nilai x harus terurut naik");
+                    return new InterpolasiSolverOutput(InterpolasiResult.failed("Data x tidak terurut naik"), steps);
+                }
+                steps.add(String.format(Locale.US, "h[%d] = %.4f", i, h[i]));
             }
 
             //  menyederhanakan 4n variabel jadi 1 sistem persamaan tridiagonal
@@ -69,7 +83,7 @@ public class NaturalCubicSpline {
                 double rhs = 3.0 * ((y[i+1] - y[i])/h[i] - (y[i] - y[i-1])/h[i-1]);
                 aug.set(i, n+1, rhs);
 
-                steps.add(String.format("Persamaan baris-%d: %.4f*c_%d + %.4f*c_%d + %.4f*c_%d = %.4f",
+                steps.add(String.format(Locale.US, "Persamaan baris-%d: %.4f*c_%d + %.4f*c_%d + %.4f*c_%d = %.4f",
                             (i + 1), h[i - 1], (i - 1), 2.0 * (h[i - 1] + h[i]), i, h[i], (i + 1), rhs));
             }
 
@@ -92,7 +106,7 @@ public class NaturalCubicSpline {
             steps.add("Nilai turunan kedua pada setiap knot: ");
             for (int i = 0; i <= n; i++) {
                 double turunanKedua = 2.0 * c[i];
-                steps.add(String.format("  Knot x_%d (%.2f) -> S''(x) = 2 * c_%d = %.6f", i, x[i], i, turunanKedua));
+                steps.add(String.format(Locale.US, "  Knot x_%d (%.2f) -> S''(x) = 2 * c_%d = %.6f", i, x[i], i, turunanKedua));
             }
 
             // hitung koefisien a, b, d tiap segmen
@@ -109,13 +123,12 @@ public class NaturalCubicSpline {
                 koefisien[i][2] = c[i];
                 koefisien[i][3] = d;
 
-                steps.add(String.format("Segmen %d [%.2f <= x <= %.2f]:", (i + 1), x[i], x[i + 1]));
-                steps.add(String.format("  a_%d = %.6f", i, a));
-                steps.add(String.format("  b_%d = %.6f", i, b));
-                steps.add(String.format("  c_%d = %.6f", i, c[i]));
-                steps.add(String.format("  d_%d = %.6f", i, d));
-                steps.add(String.format("  S_%d(x) = %.4f + %.4f*(x - %.2f) + %.4f*(x - %.2f)^2 + %.4f*(x - %.2f)^3",
-                        i, a, b, x[i], c[i], x[i], d, x[i]));
+                steps.add(String.format(Locale.US, "Segmen %d [%.2f <= x <= %.2f]:", (i + 1), x[i], x[i + 1]));
+                steps.add(String.format(Locale.US, "  a_%d = %.6f", i, a));
+                steps.add(String.format(Locale.US, "  b_%d = %.6f", i, b));
+                steps.add(String.format(Locale.US, "  c_%d = %.6f", i, c[i]));
+                steps.add(String.format(Locale.US, "  d_%d = %.6f", i, d));
+                steps.add("  " + bentukPersamaanSegmen(i, a, b, c[i], d, x[i]));
             }
 
             return new InterpolasiSolverOutput(
@@ -157,5 +170,75 @@ public class NaturalCubicSpline {
         double d = koefisien[i][3];
 
         return a + (b * dx) + (c * dx * dx) + (d * dx * dx * dx);
+    }
+
+    // mengecek apakah nilai xVal berada di dalam domain [x[0], x[n]]
+    public static boolean diDalamDomain(double[] x, double xVal) {
+        if (x == null || x.length == 0) {
+            return false;
+        }
+        return xVal >= x[0] && xVal <= x[x.length - 1];
+    }
+
+    // helper method untuk memformat persamaan segmen
+    private static String bentukPersamaanSegmen(int i, double a, double b, double c, double d, double xi) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(Locale.US, "S_%d(x) = ", i));
+
+        boolean adaSukuSebelumnya = false;
+
+        // suku a
+        if (Math.abs(a) > 1e-9) {
+            sb.append(String.format(Locale.US, "%.4f", a));
+            adaSukuSebelumnya = true;
+        }
+
+        // suku b
+        if (Math.abs(b) > 1e-9) {
+            if (adaSukuSebelumnya) {
+                if (b > 0) {
+                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)", b, xi));
+                } else {
+                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)", Math.abs(b), xi));
+                }
+            } else {
+                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)", b, xi));
+                adaSukuSebelumnya = true;
+            }
+        }
+
+        // suku kuadrat
+        if (Math.abs(c) > 1e-9) {
+            if (adaSukuSebelumnya) {
+                if (c > 0) {
+                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)^2", c, xi));
+                } else {
+                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)^2", Math.abs(c), xi));
+                }
+            } else {
+                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)^2", c, xi));
+                adaSukuSebelumnya = true;
+            }
+        }
+
+        // suku kubik
+        if (Math.abs(d) > 1e-9) {
+            if (adaSukuSebelumnya) {
+                if (d > 0) {
+                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)^3", d, xi));
+                } else {
+                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)^3", Math.abs(d), xi));
+                }
+            } else {
+                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)^3", d, xi));
+                adaSukuSebelumnya = true;
+            }
+        }
+
+        if (!adaSukuSebelumnya) {
+            sb.append("0.0000");
+        }
+
+        return sb.toString();
     }
 }
