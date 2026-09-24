@@ -128,8 +128,7 @@ public class NaturalCubicSpline {
                 steps.add(String.format(Locale.US, "  b_%d = %.6f", i, b));
                 steps.add(String.format(Locale.US, "  c_%d = %.6f", i, c[i]));
                 steps.add(String.format(Locale.US, "  d_%d = %.6f", i, d));
-                steps.add(String.format(Locale.US, "  S_%d(x) = %.4f + %.4f*(x - %.2f) + %.4f*(x - %.2f)^2 + %.4f*(x - %.2f)^3",
-                        i, a, b, x[i], c[i], x[i], d, x[i]));
+                steps.add("  " + bentukPersamaanSegmen(i, a, b, c[i], d, x[i]));
             }
 
             return new InterpolasiSolverOutput(
@@ -179,5 +178,67 @@ public class NaturalCubicSpline {
             return false;
         }
         return xVal >= x[0] && xVal <= x[x.length - 1];
+    }
+
+    // helper method untuk memformat persamaan segmen
+    private static String bentukPersamaanSegmen(int i, double a, double b, double c, double d, double xi) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(Locale.US, "S_%d(x) = ", i));
+
+        boolean adaSukuSebelumnya = false;
+
+        // suku a
+        if (Math.abs(a) > 1e-9) {
+            sb.append(String.format(Locale.US, "%.4f", a));
+            adaSukuSebelumnya = true;
+        }
+
+        // suku b
+        if (Math.abs(b) > 1e-9) {
+            if (adaSukuSebelumnya) {
+                if (b > 0) {
+                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)", b, xi));
+                } else {
+                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)", Math.abs(b), xi));
+                }
+            } else {
+                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)", b, xi));
+                adaSukuSebelumnya = true;
+            }
+        }
+
+        // suku kuadrat
+        if (Math.abs(c) > 1e-9) {
+            if (adaSukuSebelumnya) {
+                if (c > 0) {
+                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)^2", c, xi));
+                } else {
+                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)^2", Math.abs(c), xi));
+                }
+            } else {
+                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)^2", c, xi));
+                adaSukuSebelumnya = true;
+            }
+        }
+
+        // suku kubik
+        if (Math.abs(d) > 1e-9) {
+            if (adaSukuSebelumnya) {
+                if (d > 0) {
+                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)^3", d, xi));
+                } else {
+                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)^3", Math.abs(d), xi));
+                }
+            } else {
+                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)^3", d, xi));
+                adaSukuSebelumnya = true;
+            }
+        }
+
+        if (!adaSukuSebelumnya) {
+            sb.append("0.0000");
+        }
+
+        return sb.toString();
     }
 }
