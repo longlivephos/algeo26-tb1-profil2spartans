@@ -26,14 +26,14 @@ public class Matrix {
     /**
      * Membuat matriks dari array 2 dimensi (isinya disalin)
      * @param data array 2 dimensi
-     * @throws MatrixException jika array kosong atau jumlah kolom tiap baris berbeda
+     * @throws MatrixException jika array null/kosong atau jumlah kolom tiap baris berbeda
      */
     public Matrix(double[][] data) throws MatrixException {
-        if (data.length == 0 || data[0].length == 0) {
+        if (data == null || data.length == 0 || data[0] == null || data[0].length == 0) {
             throw new MatrixException("Matriks tidak boleh kosong");
         }
         for (double[] baris : data) {
-            if (baris.length != data[0].length) {
+            if (baris == null || baris.length != data[0].length) {
                 throw new MatrixException("Setiap baris matriks harus memiliki jumlah kolom yang sama");
             }
         }
@@ -65,8 +65,10 @@ public class Matrix {
      * @param i baris
      * @param j kolom
      * @return nilai elemen
+     * @throws IndexOutOfBoundsException jika indeks di luar matriks
      */
     public double get(int i, int j) {
+        cekIndeks(i, j);
         return matriks[i][j];
     }
 
@@ -75,9 +77,17 @@ public class Matrix {
      * @param i baris
      * @param j kolom
      * @param val nilai baru
+     * @throws IndexOutOfBoundsException jika indeks di luar matriks
      */
     public void set(int i, int j, double val) {
+        cekIndeks(i, j);
         matriks[i][j] = val;
+    }
+
+    private void cekIndeks(int i, int j) {
+        if (i < 0 || i >= rows || j < 0 || j >= cols) {
+            throw new IndexOutOfBoundsException("Indeks (" + i + ", " + j + ") di luar matriks " + rows + "x" + cols);
+        }
     }
 
     /**
@@ -162,8 +172,12 @@ public class Matrix {
      * @param colStart kolom awal
      * @param colEnd kolom akhir
      * @return submatriks
+     * @throws IllegalArgumentException jika batas di luar matriks atau awal > akhir
      */
     public Matrix getSubmatrix(int rowStart, int rowEnd, int colStart, int colEnd) {
+        if (rowStart < 0 || colStart < 0 || rowEnd >= rows || colEnd >= cols || rowStart > rowEnd || colStart > colEnd) {
+            throw new IllegalArgumentException("Batas submatriks tidak valid untuk matriks " + rows + "x" + cols);
+        }
         Matrix result = new Matrix(rowEnd - rowStart + 1, colEnd - colStart + 1);
         for (int i = rowStart; i <= rowEnd; i++) {
             for (int j = colStart; j <= colEnd; j++) {
@@ -179,8 +193,15 @@ public class Matrix {
      * @param excludeRow baris yang dibuang
      * @param excludeCol kolom yang dibuang
      * @return matriks berukuran (rows-1) x (cols-1)
+     * @throws IllegalArgumentException jika matriks 1 baris/kolom atau indeks di luar matriks
      */
     public Matrix getMinor(int excludeRow, int excludeCol) {
+        if (rows < 2 || cols < 2) {
+            throw new IllegalArgumentException("Matriks " + rows + "x" + cols + " tidak punya minor");
+        }
+        if (excludeRow < 0 || excludeRow >= rows || excludeCol < 0 || excludeCol >= cols) {
+            throw new IllegalArgumentException("Baris/kolom yang dibuang di luar matriks");
+        }
         Matrix result = new Matrix(rows - 1, cols - 1);
         int ri = 0;
         for (int i = 0; i < rows; i++) {
@@ -214,15 +235,35 @@ public class Matrix {
      */
     @Override
     public String toString() {
-        String s = "";
-        for (int i = 0; i < rows; i++) {
-            s += "[ ";
-            for (int j = 0; j < cols; j++) {
-                s += String.format(Locale.US, "%.3f", NumberFormatter.round(matriks[i][j]));
-                if (j < cols - 1) s += "  ";
+        return toString(rows, cols);
+    }
+
+    /**
+     * Mengubah matriks jadi teks, tapi hanya sebagian baris/kolom yang ditampilkan
+     * Dipakai untuk menampilkan matriks besar di layar supaya tidak membanjiri terminal
+     * @param maxBaris jumlah baris maksimal yang ditampilkan
+     * @param maxKolom jumlah kolom maksimal yang ditampilkan
+     * @return teks matriks
+     */
+    public String toString(int maxBaris, int maxKolom) {
+        int tampilBaris = Math.min(rows, maxBaris);
+        int tampilKolom = Math.min(cols, maxKolom);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tampilBaris; i++) {
+            sb.append("[ ");
+            for (int j = 0; j < tampilKolom; j++) {
+                sb.append(String.format(Locale.US, "%.3f", NumberFormatter.round(matriks[i][j])));
+                if (j < tampilKolom - 1) sb.append("  ");
             }
-            s += " ]\n";
+            if (tampilKolom < cols) {
+                sb.append("  ... (").append(cols - tampilKolom).append(" kolom lagi)");
+            }
+            sb.append(" ]\n");
         }
-        return s;
+        if (tampilBaris < rows) {
+            sb.append("... (").append(rows - tampilBaris).append(" baris lagi)\n");
+        }
+        return sb.toString();
     }
 }
