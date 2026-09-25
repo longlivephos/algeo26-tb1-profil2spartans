@@ -2,7 +2,7 @@ package algeo.core.util;
 import java.util.Locale;
 public class NumberFormatter {
     /**
-     * Membulatkan angka ke 3 angka di belakang koma
+     * Membulatkan angka ke 3 angka di belakang koma, setengah dibulatkan menjauhi nol
      * @param value angka yang mau dibulatkan
      * @return angka hasil pembulatan
      */
@@ -13,18 +13,19 @@ public class NumberFormatter {
         if (Math.abs(value) >= 1e15) {
             return value;
         }
-        double hasil = Math.round(value * 1000.0) / 1000.0;
+        double positif = Math.abs(value) * 1000.0;
+        long dibulatkan = (long) (positif + 0.5);
+        double hasil = dibulatkan / 1000.0;
         if (hasil == 0) {
             return 0.0;
         }
-        return hasil;
+        return value < 0 ? -hasil : hasil;
     }
 
     /**
-     * Mengubah angka jadi teks untuk ditampilkan (maksimal 3 angka di belakang koma)
-     * Angka bukan nol yang terlalu kecil ditulis dengan notasi e supaya tidak terbaca 0, berlaku juga dengan angka yang sayngat besar
+     * Mengubah angka jadi teks untuk ditampilkan, maksimal 3 angka di belakang koma dan tanpa nol di belakang serta ngka yang sangat besar (>= 1e15) ditulis dengan notasi e
      * @param value angka yang mau ditampilkan
-     * @return teks angka, contoh: "2.5", "-3", "1.235e-05"
+     * @return teks angka, contoh: "2.5", "-3", "0.333"
      */
     public static String teks(double value) {
         if (Double.isNaN(value)) {
@@ -33,7 +34,7 @@ public class NumberFormatter {
         if (Double.isInfinite(value)) {
             return value > 0 ? "Infinity" : "-Infinity";
         }
-        if (value != 0 && (Math.abs(value) < 0.0005 || Math.abs(value) >= 1e15)) {
+        if (Math.abs(value) >= 1e15) {
             return String.format(Locale.US, "%.3e", value);
         }
 
