@@ -5,11 +5,11 @@ import java.util.List;
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.util.NumberFormatter;
+import algeo.core.util.Toleransi;
 
 public class GaussEliminationSolver {
-    private static final double EPS = 1e-12;
     /**
-     * Menyelesaikan SPL dengan eliminasi Gauss
+     * Menyelesaikan SPL dengan eliminasi Gauss (partial pivoting) lalu substitusi mundur
      * @param augmented matriks augmented [A|b]
      * @return hasil SPL beserta langkah-langkahnya
      * @throws MatrixException jika matriks augmented kurang dari 2 kolom
@@ -28,6 +28,8 @@ public class GaussEliminationSolver {
         } else {
             steps.add("Matriks besar, langkah tidak ditampilkan.");
         }
+        double tol = Toleransi.hitung(m, n);
+        double tolB = Toleransi.hitung(m, n + 1) * 10;
 
         int[] kolomPivot = new int[rows];
         boolean[] adaPivot = new boolean[n];
@@ -40,7 +42,7 @@ public class GaussEliminationSolver {
                     maks = i;
                 }
             }
-            if (Math.abs(m.get(maks, kol)) < EPS) {
+            if (Toleransi.nol(m.get(maks, kol), tol)) {
                 continue;
             }
 
@@ -61,7 +63,7 @@ public class GaussEliminationSolver {
             }
             m.set(baris, kol, 1);
             if (catat) {
-                steps.add("Baris " + (baris + 1) + " = Baris " + (baris + 1) + " / " + NumberFormatter.round(pivot) + ":\n" + m);
+                steps.add("Baris " + (baris + 1) + " = Baris " + (baris + 1) + " / " + NumberFormatter.teks(pivot) + ":\n" + m);
             }
 
             for (int i = baris + 1; i < rows; i++) {
@@ -72,7 +74,7 @@ public class GaussEliminationSolver {
                 }
                 m.set(i, kol, 0);
                 if (catat) {
-                    steps.add("Baris " + (i + 1) + " = Baris " + (i + 1) + " - (" + NumberFormatter.round(faktor) + ") x Baris " + (baris + 1) + ":\n" + m);
+                    steps.add("Baris " + (i + 1) + " = Baris " + (i + 1) + " - (" + NumberFormatter.teks(faktor) + ") x Baris " + (baris + 1) + ":\n" + m);
                 }
             }
 
@@ -86,7 +88,7 @@ public class GaussEliminationSolver {
         }
 
         for (int i = rank; i < rows; i++) {
-            if (Math.abs(m.get(i, n)) > EPS) {
+            if (!Toleransi.nol(m.get(i, n), tolB)) {
                 steps.add("Baris " + (i + 1) + " berbentuk 0 = c (c tidak nol), SPL tidak punya solusi.");
                 return new SolverOutput(SPLResult.noSolution(), steps);
             }
@@ -101,7 +103,7 @@ public class GaussEliminationSolver {
                 }
                 x[i] = sisa;
                 if (catat) {
-                    steps.add("x" + (i + 1) + " = " + NumberFormatter.round(x[i]));
+                    steps.add("x" + (i + 1) + " = " + NumberFormatter.teks(x[i]));
                 }
             }
             steps.add("Substitusi mundur selesai, solusi tunggal ditemukan.");
@@ -136,45 +138,6 @@ public class GaussEliminationSolver {
             }
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (int j = 0; j < n; j++) {
-            sb.append("x").append(j + 1).append(" =");
-            boolean adaSuku = false;
-
-            double konstanta = NumberFormatter.round(x[j][bebas]);
-            if (konstanta != 0) {
-                sb.append(" ").append(konstanta);
-                adaSuku = true;
-            }
-            for (int c = 0; c < bebas; c++) {
-                double koef = NumberFormatter.round(x[j][c]);
-                if (koef == 0) continue;
-                String angka = "";
-                if (Math.abs(koef) != 1) angka = Math.abs(koef) + "*";
-                if (adaSuku) {
-                    if (koef < 0) sb.append(" - ");
-                    else sb.append(" + ");
-                } else {
-                    if (koef < 0) sb.append(" -");
-                    else sb.append(" ");
-                }
-                sb.append(angka).append("t").append(c + 1);
-                adaSuku = true;
-            }
-            if (!adaSuku) sb.append(" 0");
-            sb.append("\n");
-        }
-
-        sb.append("dengan ");
-        k = 0;
-        for (int j = 0; j < n; j++) {
-            if (!adaPivot[j]) {
-                if (k > 0) sb.append(", ");
-                k++;
-                sb.append("t").append(k).append(" = x").append(j + 1);
-            }
-        }
-        sb.append(" (bilangan real bebas)");
-        return sb.toString();
+        return SPLFormatter.parametrik(x, adaPivot);
     }
 }
