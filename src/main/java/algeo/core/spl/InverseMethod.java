@@ -6,10 +6,9 @@ import java.util.List;
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.util.NumberFormatter;
+import algeo.core.util.Toleransi;
 
 public class InverseMethod {
-    private static final double EPS = 1e-12;
-
     /**
      * Menyelesaikan SPL dengan metode matriks balikan (x = A^-1 b)
      * @param augmented matriks augmented [A|b], A harus persegi
@@ -30,6 +29,8 @@ public class InverseMethod {
         if (catat) {
             steps.add("Matriks A:\n" + a);
             steps.add("Vektor b:\n" + b);
+        } else {
+            steps.add("Matriks besar, langkah tidak ditampilkan.");
         }
 
         Matrix inv;
@@ -52,7 +53,7 @@ public class InverseMethod {
     }
 
     /**
-     * Mencari invers matriks persegi dengan Gauss-Jordan pada [A|I]
+     * Mencari invers matriks persegi dengan Gauss-Jordan (partial pivoting) pada [A|I]
      * @param a matriks persegi
      * @param steps tempat menyimpan langkah (boleh kosong)
      * @param catat true jika langkah OBE mau dicatat
@@ -64,6 +65,7 @@ public class InverseMethod {
             throw new MatrixException("Matriks tidak persegi, tidak memiliki balikan");
         }
         int n = a.getRows();
+        double tol = Toleransi.hitung(a);
 
         Matrix m = new Matrix(n, 2 * n);
         for (int i = 0; i < n; i++) {
@@ -83,7 +85,7 @@ public class InverseMethod {
                     maks = i;
                 }
             }
-            if (Math.abs(m.get(maks, kol)) < EPS) {
+            if (Toleransi.nol(m.get(maks, kol), tol)) {
                 throw new MatrixException("Matriks tidak memiliki balikan");
             }
 
@@ -104,7 +106,7 @@ public class InverseMethod {
             }
             m.set(kol, kol, 1);
             if (catat) {
-                steps.add("Baris " + (kol + 1) + " = Baris " + (kol + 1) + " / " + NumberFormatter.round(pivot) + ":\n" + m);
+                steps.add("Baris " + (kol + 1) + " = Baris " + (kol + 1) + " / " + NumberFormatter.teks(pivot) + ":\n" + m);
             }
 
             for (int i = 0; i < n; i++) {
@@ -116,7 +118,7 @@ public class InverseMethod {
                 }
                 m.set(i, kol, 0);
                 if (catat) {
-                    steps.add("Baris " + (i + 1) + " = Baris " + (i + 1) + " - (" + NumberFormatter.round(faktor) + ") x Baris " + (kol + 1) + ":\n" + m);
+                    steps.add("Baris " + (i + 1) + " = Baris " + (i + 1) + " - (" + NumberFormatter.teks(faktor) + ") x Baris " + (kol + 1) + ":\n" + m);
                 }
             }
         }
