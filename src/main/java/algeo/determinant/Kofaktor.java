@@ -1,59 +1,142 @@
 package algeo.determinant;
 
+import java.util.List;
+
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
+import algeo.core.util.NumberFormatter;
 
 public class Kofaktor {
+    
+    // Batas aman ukuran matriks untuk Kofaktor agar tidak hang / Out of Memory
+    private static final int BATAS_N = 11;
+    // Batas toleransi presisi desimal untuk mendeteksi angka 0
+    private static final double EPS = 1e-12;
+
     /**
-     * Menghitung nilai determinan dari sebuah matriks menggunakan Ekspansi Kofaktor.
-     * Nilai yang dikembalikan adalah nilai mentah (tanpa pembulatan) untuk menjaga akurasi dan presisi pada perhitungan lanjutan seperti Invers atau Aturan Cramer.
-     * @param matriks Objek matriks persegi yang akan dihitung determinannya.
-     * @return Nilai determinan matriks murni dalam tipe double.
-     * @throws MatrixException Jika ukuran matriks input tidak berbentuk persegi.
+     * Fungsi utama perhitungan kofaktor tanpa mencatat langkah (silent mode).
+     * Digunakan untuk perhitungan lanjutan seperti Invers atau Cramer.
      */
     public static double hitungKofaktor(Matrix matriks) throws MatrixException {
-        // Validasi matriks persegi
+        return hitungKofaktor(matriks, null);
+    }
+
+    /**
+     * Fungsi perhitungan kofaktor dengan pencatatan langkah (top-level only).
+     */
+    public static double hitungKofaktor(Matrix matriks, List<String> steps) throws MatrixException {
         if (!matriks.isSquare()) {
             throw new MatrixException("Matriks harus berbentuk persegi untuk menghitung determinan");
         }
+
+        int n = matriks.getRows();
         
-        //fungsi rekursif untuk hitung determinan
-        double det = hitungRekursif(matriks);
-        return det;
+        // Proteksi O(N!) - Tolak eksekusi jika melebihi batas
+        if (n > BATAS_N) {
+            throw new MatrixException("Ukuran matriks (" + n + "x" + n + ") terlalu besar untuk metode Kofaktor (Batas maksimal 11x11). Silakan gunakan metode OBE.");
+        }
+
+        boolean catat = (steps != null);
+        return hitungRekursif(matriks, catat, steps);
     }
 
-    // Fungsi internal memecah matriks secara rekursif
-    // @param m Matriks atau sub-matriks yang sedang diproses.
-    // @return Nilai determinan dari matriks input.
-    private static double hitungRekursif(Matrix m) {
+    /**
+     * Fungsi internal rekursif dengan pencarian baris/kolom nol terbanyak.
+     */
+    private static double hitungRekursif(Matrix m, boolean isTopLevel, List<String> steps) throws MatrixException {
         int n = m.getRows();
-        
-        // Basis 1: untuk matriks sisa 1x1
-        if (n == 1) {
-            return m.get(0, 0);
+
+        if (n == 1) return m.get(0, 0);
+        if (n == 2) return (m.get(0, 0) * m.get(1, 1)) - (m.get(0, 1) * m.get(1, 0));
+
+        // 1. Cari baris atau kolom dengan elemen 0 terbanyak untuk efisiensi
+        int maxZeros = -1;
+        int bestIdx = 0;
+        boolean isRow = true;
+
+        for (int i = 0; i < n; i++) {
+            int zeroCountRow = 0;
+            int zeroCountCol = 0;
+            for (int j = 0; j < n; j++) {
+                if (Math.abs(m.get(i, j)) < EPS) zeroCountRow++;
+                if (Math.abs(m.get(j, i)) < EPS) zeroCountCol++;
+            }
+            
+            if (zeroCountRow > maxZeros) {
+                maxZeros = zeroCountRow;
+                bestIdx = i;
+                isRow = true;
+            }
+            if (zeroCountCol > maxZeros) {
+                maxZeros = zeroCountCol;
+                bestIdx = i;
+                isRow = false;
+            }
         }
+
+        Matrix targetMat = m;
         
-        // Basis 2: untuk matriks sisa 2x2 
-        if (n == 2) {
-            return (m.get(0, 0) * m.get(1, 1)) - (m.get(0, 1) * m.get(1, 0));
+        // 2. Jika kolom yang memiliki nol terbanyak, lakukan Transpose: det(A) = det(A^T)
+        if (!isRow) {
+            double[][] tData = new double[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    tData[i][j] = m.get(j, i); // Membalik baris dan kolom
+                }
+            }
+            
+            targetMat = new Matrix(tData);
+            
+            if (isTopLevel && steps != null) {
+                steps.add("Kolom " + (bestIdx + 1) + " dipilih karena memiliki nol terbanyak (" + maxZeros + " nol).");
+                steps.add("Karena det(A) = det(A^T), matriks di-transpose. Ekspansi berlanjut di baris " + (bestIdx + 1) + " matriks baru:\n" + targetMat.toString());
+            }
+        } else {
+            if (isTopLevel && steps != null) {
+                steps.add("Baris " + (bestIdx + 1) + " dipilih sebagai acuan karena memiliki nol terbanyak (" + maxZeros + " nol).");
+            }
         }
 
         double det = 0;
-        int tanda = 1;
+        StringBuilder rumus = new StringBuilder("det =");
 
-        // Ekspansi kofaktor baris pertama 
+        // 3. Lakukan ekspansi sepanjang baris terpilih (bestIdx)
         for (int j = 0; j < n; j++) {
-            // Ambil sub-matriks dengan membuang baris 0 dan kolom j
-            Matrix subMatriks = m.getMinor(0, j);
+            double elemen = targetMat.get(bestIdx, j);
             
-            // Rumus kofaktor:
-            det += tanda * m.get(0, j) * hitungRekursif(subMatriks);
+            // Lewati perhitungan rekursif jika elemen = 0 (optimasi efisiensi terbesar)
+            if (Math.abs(elemen) < EPS) {
+                if (isTopLevel && steps != null) {
+                    rumus.append(" + 0");
+                    steps.add("Elemen a[" + (bestIdx + 1) + "][" + (j + 1) + "] = 0, kofaktor dilewati.");
+                }
+                continue; 
+            }
+
+            Matrix minor = targetMat.getMinor(bestIdx, j);
+            int tanda = ((bestIdx + j) % 2 == 0) ? 1 : -1;
             
-            // Ubah tanda untuk elemen berikutnya (+, -, +, -)
-            tanda *= -1; 
+            // Panggilan rekursif murni tanpa mencetak langkah bawaan (isTopLevel = false)
+            double minorDet = hitungRekursif(minor, false, null);
+            double elemenKofaktor = tanda * minorDet;
+            
+            det += elemen * elemenKofaktor;
+
+            if (isTopLevel && steps != null) {
+                steps.add("a[" + (bestIdx + 1) + "][" + (j + 1) + "] = " + NumberFormatter.round(elemen) 
+                        + "  |  det(Minor) = " + NumberFormatter.round(minorDet) 
+                        + "  |  C[" + (bestIdx + 1) + "][" + (j + 1) + "] = " + NumberFormatter.round(elemenKofaktor));
+                
+                rumus.append(" + (").append(NumberFormatter.round(elemen))
+                     .append(" * ").append(NumberFormatter.round(elemenKofaktor)).append(")");
+            }
         }
-        
+
+        if (isTopLevel && steps != null) {
+            String hasilRumus = rumus.toString().replace("det = +", "det =");
+            steps.add("Rumus Akhir: " + hasilRumus);
+        }
+
         return det;
     }
-  
 }
