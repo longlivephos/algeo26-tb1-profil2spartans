@@ -1,7 +1,9 @@
 package algeo;
 
+import java.awt.GraphicsEnvironment;
 import java.util.Scanner;
 
+import algeo.gui.MainFrame;
 import algeo.modules.MenuUtama;
 
 public class App {
@@ -11,10 +13,11 @@ public class App {
         if (modeCli) {
             Scanner sc = new Scanner(System.in);
             new MenuUtama().jalankan(sc);
+        } else if (GraphicsEnvironment.isHeadless()) {
+            System.out.println("Tidak ada layar untuk menampilkan GUI. Jalankan mode CLI:");
+            System.out.println("  java -jar <nama-jar>.jar cli");
         } else {
-            // TODO: launch GUI
-            System.out.println("Mode GUI belum tersedia. Jalankan dengan argumen 'cli':");
-            System.out.println("  java -jar app.jar cli");
+            MainFrame.tampilkan();
         }
     }
 }
