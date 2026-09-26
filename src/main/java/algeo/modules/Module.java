@@ -1,5 +1,10 @@
 package algeo.modules;
 
+import java.util.Scanner;
+
 public interface Module {
-    void jalankan();
+    /**
+     * @param sc scanner bersama
+     */
+    void jalankan(Scanner sc);
 }
