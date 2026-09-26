@@ -9,7 +9,6 @@ import algeo.core.util.NumberFormatter;
 import algeo.determinant.OBE;
 
 public class Adjoin {
-    private static final double EPS = 1e-12;
 
     /**
      * Menghitung invers dari suatu matriks persegi menggunakan metode Adjoin (Transpose Kofaktor).
@@ -27,6 +26,15 @@ public class Adjoin {
         }
 
         int n = matriks.getRows();
+
+        if (n > 100) {
+            steps.add("Ukuran matriks terlalu besar (n = " + n + "). Kompleksitas metode Adjoin terlalu lambat untuk n > 100.");
+            return new InverseSolverOutput(
+                InverseResult.noInverse("gunakan metode Augmentasi"), 
+                steps
+            );
+        }
+
         boolean catat = n <= 11;
 
         try {
@@ -36,12 +44,11 @@ public class Adjoin {
                 steps.add("Matriks berukuran besar (n > 11), langkah tidak ditampilkan.");
             }
 
-            // determinan. jika det = 0, tidak ada invers
             double det = OBE.hitungOBE(matriks);
             steps.add("Hitung determinan matriks A: det(A) = " + NumberFormatter.round(det));
 
-            if (Math.abs(det) < EPS) {
-                steps.add("Determinan matriks bernilai 0, invers tidak ada.");
+            if (det == 0.0) {
+                steps.add("Determinan matriks bernilai 0 (berdasarkan toleransi pivot OBE), invers tidak ada.");
                 return new InverseSolverOutput(
                     InverseResult.noInverse("Matriks singular (determinan = 0), invers tidak ada"), 
                     steps
