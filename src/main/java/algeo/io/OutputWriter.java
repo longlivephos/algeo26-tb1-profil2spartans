@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import algeo.core.interpolasi.InterpolasiResult;
 import algeo.core.matrix.Matrix;
 import algeo.core.spl.SPLResult;
 import algeo.core.util.NumberFormatter;
@@ -33,6 +34,50 @@ public class OutputWriter {
             hasilAkhir = "matriks tidak memiliki balikan (" + hasil.getErrorMessage() + ")";
         }
         return teksUmum(metode, input.toString(), steps, hasilAkhir);
+    }
+
+    /** Menyusun hasil Interpolasi Polinomial. */
+    public static String teksInterpolasi(String metode, Matrix input, List<String> steps, InterpolasiResult hasil, String domain, String persamaan, String hasilEvaluasi) {
+        String hasilAkhir;
+        if (hasil.getType() == InterpolasiResult.ResultType.SUCCESS) {
+            hasilAkhir = "Domain Interpolasi: " + domain + "\n\n";
+            hasilAkhir += "Persamaan Polinomial:\nP(x) = " + persamaan + "\n";
+            if (hasilEvaluasi != null && !hasilEvaluasi.trim().isEmpty()) {
+                hasilAkhir += "\nHasil Evaluasi Titik (xt):\n" + hasilEvaluasi;
+            }
+        } else {
+            hasilAkhir = "Gagal membentuk polinomial (" + hasil.getErrorMessage() + ")";
+        }
+        return teksUmum(metode, input.toString(), steps, hasilAkhir); 
+    }
+
+    /** Menyusun hasil Natural Cubic Spline sesuai spek Tubes. */
+    public static String teksSplineKubik(String metode, Matrix input, List<String> steps, InterpolasiResult hasil, String domain, String persamaanSegmen, String hasilEvaluasi) {
+        String hasilAkhir;
+        if (hasil.getType() == InterpolasiResult.ResultType.SUCCESS) {
+            hasilAkhir = "Domain Interpolasi Keseluruhan: " + domain + "\n\n";
+            hasilAkhir += "Persamaan Spline Kubik per Segmen Si(x):\n" + persamaanSegmen;
+            
+            if (hasilEvaluasi != null && !hasilEvaluasi.trim().isEmpty()) {
+                hasilAkhir += "\nHasil Evaluasi Titik (xt):\n" + hasilEvaluasi;
+            }
+        } else {
+            hasilAkhir = "Gagal membentuk spline kubik (" + hasil.getErrorMessage() + ")";
+        }
+        return teksUmum(metode, input.toString(), steps, hasilAkhir);
+    }
+
+    /** Menyusun hasil Regresi Spline Kubik. */
+    public static String teksRegresiSpline(String metode, Matrix input, List<String> steps, String posisiKnot, String persamaanRegresi, String hasilPrediksi) {
+        StringBuilder hasilAkhir = new StringBuilder();
+        hasilAkhir.append("Posisi Knot: ").append(posisiKnot).append("\n\n");
+        hasilAkhir.append("Persamaan Regresi y^(x):\n").append(persamaanRegresi).append("\n");
+        
+        if (hasilPrediksi != null && !hasilPrediksi.trim().isEmpty()) {
+            hasilAkhir.append("\nHasil Prediksi y^(xt):\n").append(hasilPrediksi);
+        }
+        
+        return teksUmum(metode, input.toString(), steps, hasilAkhir.toString());
     }
 
     // Tulis teks ke file
