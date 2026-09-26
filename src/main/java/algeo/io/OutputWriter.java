@@ -51,6 +51,22 @@ public class OutputWriter {
         return teksUmum(metode, input.toString(), steps, hasilAkhir); 
     }
 
+    /** Menyusun hasil Natural Cubic Spline sesuai spek Tubes. */
+    public static String teksSplineKubik(String metode, Matrix input, List<String> steps, InterpolasiResult hasil, String domain, String persamaanSegmen, String hasilEvaluasi) {
+        String hasilAkhir;
+        if (hasil.getType() == InterpolasiResult.ResultType.SUCCESS) {
+            hasilAkhir = "Domain Interpolasi Keseluruhan: " + domain + "\n\n";
+            hasilAkhir += "Persamaan Spline Kubik per Segmen Si(x):\n" + persamaanSegmen;
+            
+            if (hasilEvaluasi != null && !hasilEvaluasi.trim().isEmpty()) {
+                hasilAkhir += "\nHasil Evaluasi Titik (xt):\n" + hasilEvaluasi;
+            }
+        } else {
+            hasilAkhir = "Gagal membentuk spline kubik (" + hasil.getErrorMessage() + ")";
+        }
+        return teksUmum(metode, input.toString(), steps, hasilAkhir);
+    }
+
     // Tulis teks ke file
 
     public static void simpan(String path, String isi) throws IOException {

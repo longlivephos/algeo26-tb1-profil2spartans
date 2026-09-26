@@ -15,8 +15,7 @@ import algeo.io.OutputWriter;
 public class ModuleInterpolasi implements Module {
 
     @Override
-    public void jalankan() {
-        // Deklarasi Scanner secara lokal 
+    public void jalankan(Scanner sc) {
         Scanner scanner = new Scanner(System.in);
         String namaMetode = "Interpolasi Polinomial";
         
