@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import algeo.core.interpolasi.InterpolasiResult;
 import algeo.core.matrix.Matrix;
 import algeo.core.spl.SPLResult;
 import algeo.core.util.NumberFormatter;
@@ -33,6 +34,21 @@ public class OutputWriter {
             hasilAkhir = "matriks tidak memiliki balikan (" + hasil.getErrorMessage() + ")";
         }
         return teksUmum(metode, input.toString(), steps, hasilAkhir);
+    }
+
+    /** Menyusun hasil Interpolasi Polinomial. */
+    public static String teksInterpolasi(String metode, Matrix input, List<String> steps, InterpolasiResult hasil, String domain, String persamaan, String hasilEvaluasi) {
+        String hasilAkhir;
+        if (hasil.getType() == InterpolasiResult.ResultType.SUCCESS) {
+            hasilAkhir = "Domain Interpolasi: " + domain + "\n\n";
+            hasilAkhir += "Persamaan Polinomial:\nP(x) = " + persamaan + "\n";
+            if (hasilEvaluasi != null && !hasilEvaluasi.trim().isEmpty()) {
+                hasilAkhir += "\nHasil Evaluasi Titik (xt):\n" + hasilEvaluasi;
+            }
+        } else {
+            hasilAkhir = "Gagal membentuk polinomial (" + hasil.getErrorMessage() + ")";
+        }
+        return teksUmum(metode, input.toString(), steps, hasilAkhir); 
     }
 
     // Tulis teks ke file
