@@ -67,6 +67,19 @@ public class OutputWriter {
         return teksUmum(metode, input.toString(), steps, hasilAkhir);
     }
 
+    /** Menyusun hasil Regresi Spline Kubik. */
+    public static String teksRegresiSpline(String metode, Matrix input, List<String> steps, String posisiKnot, String persamaanRegresi, String hasilPrediksi) {
+        StringBuilder hasilAkhir = new StringBuilder();
+        hasilAkhir.append("Posisi Knot: ").append(posisiKnot).append("\n\n");
+        hasilAkhir.append("Persamaan Regresi y^(x):\n").append(persamaanRegresi).append("\n");
+        
+        if (hasilPrediksi != null && !hasilPrediksi.trim().isEmpty()) {
+            hasilAkhir.append("\nHasil Prediksi y^(xt):\n").append(hasilPrediksi);
+        }
+        
+        return teksUmum(metode, input.toString(), steps, hasilAkhir.toString());
+    }
+
     // Tulis teks ke file
 
     public static void simpan(String path, String isi) throws IOException {
