@@ -26,10 +26,7 @@ public class DeterminantPage extends FeaturePage {
     });
 
     public DeterminantPage() {
-        super("DETERMINAN",
-              "Isi matriks persegi satu angka per kotak. Input manual maksimal 11 x 11, "
-              + "file .txt sampai 1001 x 1001.",
-              new MatrixInput(MatrixInput.Gaya.MATRIKS, 3, 3, 11, 11));
+        super("DETERMINAN", "Isi matriks persegi satu angka per kotak. Input manual maksimal 11 x 11, " + "file .txt sampai 1001 x 1001.", new MatrixInput(MatrixInput.Gaya.MATRIKS, 3, 3, 11, 11));
         ThemedUI.gayakan(pilihanMetode);
         tambahBarisOpsi(Theme.label("Metode:"), pilihanMetode);
     }
@@ -41,9 +38,7 @@ public class DeterminantPage extends FeaturePage {
         List<String> langkah = new ArrayList<>();
 
         if (!m.isSquare()) {
-            String teks = "Metode: " + metode + "\n\nInput matriks:\n" + m
-                    + "\nHasil:\nmatriks tidak memiliki determinan (matriks tidak persegi, "
-                    + m.getRows() + " x " + m.getCols() + ")";
+            String teks = "Metode: " + metode + "\n\nInput matriks:\n" + m + "\nHasil:\nmatriks tidak memiliki determinan (matriks tidak persegi, " + m.getRows() + " x " + m.getCols() + ")";
             tampilkanProses(langkah, teks, "TIDAK ADA DETERMINAN", null);
             return;
         }
@@ -53,11 +48,9 @@ public class DeterminantPage extends FeaturePage {
             det = OBE.hitungOBE(m, langkah);
         } else {
             det = Kofaktor.hitungKofaktor(m, langkah);
-            // library kofaktor tidak mencetak matriksnya, jadi ditampilkan di langkah pertama
-            // supaya tampilannya sama dengan metode lain
+            // library kofaktor tidak mencetak matriksnya, jadi ditampilkan di langkah pertama supaya tampilannya sama dengan metode lain
             langkah.add(0, "Matriks input A:\n" + m);
         }
-        tampilkanProses(langkah, OutputWriter.teksDeterminan(metode, m, langkah, det),
-                "det = " + NumberFormatter.teks(det), null);
+        tampilkanProses(langkah, OutputWriter.teksDeterminan(metode, m, langkah, det), "det = " + NumberFormatter.teks(det), null);
     }
 }

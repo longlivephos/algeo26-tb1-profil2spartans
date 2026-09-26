@@ -38,10 +38,7 @@ public class RegressionPage extends FeaturePage {
     private StringBuilder hasilPrediksi = new StringBuilder();
 
     public RegressionPage() {
-        super("REGRESI SPLINE",
-              "Isi titik sampel (x, y) maksimal 10 titik, lalu posisi knot (boleh 0 knot). "
-              + "Jumlah titik minimal derajat + 1 + jumlah knot.",
-              new MatrixInput(MatrixInput.Gaya.TITIK, 6, 2, 10, 2));
+        super("REGRESI SPLINE", "Isi titik sampel (x, y) maksimal 10 titik, lalu posisi knot (boleh 0 knot). " + "Jumlah titik minimal derajat + 1 + jumlah knot.", new MatrixInput(MatrixInput.Gaya.TITIK, 6, 2, 10, 2));
         ThemedUI.gayakan(pilihanDerajat);
         Theme.gayakan(fieldXt);
         PixelButton tombolPrediksi = new PixelButton("PREDIKSI", Theme.BIRU, Theme.BIRU_TUA);
@@ -49,8 +46,7 @@ public class RegressionPage extends FeaturePage {
         fieldXt.addActionListener(e -> amanJalankan(this::prediksi));
 
         tambahBarisOpsi(gridKnot);
-        JLabel catatan = new JLabel("<html><body style='width:300px'>Knot harus terurut naik dan berada "
-                + "di antara x terkecil dan x terbesar.</body></html>");
+        JLabel catatan = new JLabel("<html><body style='width:300px'>Knot harus terurut naik dan berada " + "di antara x terkecil dan x terbesar.</body></html>");
         catatan.setFont(Theme.BIASA);
         catatan.setForeground(Theme.TEKS);
         tambahBarisOpsi(catatan);
@@ -114,8 +110,7 @@ public class RegressionPage extends FeaturePage {
         for (int i = 0; i < koef.length; i++) {
             persamaan.append("\n  b").append(i).append(" = ").append(NumberFormatter.teks(koef[i]));
         }
-        return OutputWriter.teksRegresiSpline(namaMetode, titik, output.getSteps(), posisiKnot,
-                persamaan.toString(), hasilPrediksi.toString());
+        return OutputWriter.teksRegresiSpline(namaMetode, titik, output.getSteps(), posisiKnot, persamaan.toString(), hasilPrediksi.toString());
     }
 
     @Override

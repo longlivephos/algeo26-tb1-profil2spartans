@@ -26,10 +26,7 @@ public class InversePage extends FeaturePage {
     });
 
     public InversePage() {
-        super("MATRIKS BALIKAN",
-              "Isi matriks persegi satu angka per kotak. Input manual maksimal 11 x 11, "
-              + "file .txt sampai 1001 x 1001.",
-              new MatrixInput(MatrixInput.Gaya.MATRIKS, 3, 3, 11, 11));
+        super("MATRIKS BALIKAN", "Isi matriks persegi satu angka per kotak. Input manual maksimal 11 x 11, " + "file .txt sampai 1001 x 1001.", new MatrixInput(MatrixInput.Gaya.MATRIKS, 3, 3, 11, 11));
         ThemedUI.gayakan(pilihanMetode);
         tambahBarisOpsi(Theme.label("Metode:"), pilihanMetode);
     }
@@ -40,10 +37,8 @@ public class InversePage extends FeaturePage {
         String metode = (String) pilihanMetode.getSelectedItem();
 
         if (!m.isSquare()) {
-            InverseResult gagal = InverseResult.noInverse("matriks tidak persegi, "
-                    + m.getRows() + " x " + m.getCols());
-            tampilkanProses(new ArrayList<>(), OutputWriter.teksInvers(metode, m, new ArrayList<>(), gagal),
-                    "TIDAK ADA BALIKAN", null);
+            InverseResult gagal = InverseResult.noInverse("matriks tidak persegi, " + m.getRows() + " x " + m.getCols());
+            tampilkanProses(new ArrayList<>(), OutputWriter.teksInvers(metode, m, new ArrayList<>(), gagal), "TIDAK ADA BALIKAN", null);
             return;
         }
 

@@ -59,8 +59,6 @@ public class MathText extends JComponent {
         g2.dispose();
     }
 
-    // ===================== pengurai markup =====================
-
     /** Membaca markup sampai habis (atau sampai '}' kalau sedang di dalam kurung kurawal). */
     private Deret uraiDeret(String s, boolean dalamKurung) {
         Deret deret = new Deret();
@@ -80,7 +78,7 @@ public class MathText extends JComponent {
                 simpanTeks(deret, teks);
                 posisi += "\\frac{".length();
                 Deret atas = uraiDeret(s, true);
-                posisi++; // lewati '{' pembuka penyebut
+                posisi++;
                 Deret bawah = uraiDeret(s, true);
                 deret.anak.add(new Pecahan(atas, bawah));
             } else {
@@ -109,8 +107,6 @@ public class MathText extends JComponent {
             teks.setLength(0);
         }
     }
-
-    // ===================== model kotak untuk menggambar =====================
 
     private static class Ukuran {
         int lebar;
@@ -162,12 +158,10 @@ public class MathText extends JComponent {
         }
     }
 
-    /** Teks biasa. Pada gaya RUMUS, huruf tunggal dibuat miring (variabel). */
     private class Teks extends Simpul {
         final List<String> potongan = new ArrayList<>();
 
         Teks(String teks) {
-            // pisahkan per kelompok huruf dan bukan huruf
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < teks.length(); i++) {
                 char c = teks.charAt(i);

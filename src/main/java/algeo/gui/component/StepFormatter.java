@@ -34,18 +34,13 @@ public final class StepFormatter {
     private static final Pattern TUKAR = Pattern.compile("Tukar baris (\\d+) dengan baris (\\d+)(?: \\((.*)\\))?:?");
     private static final Pattern OPERASI = Pattern.compile("Baris (\\d+) = Baris \\1 - \\((\\S+)\\) x Baris (\\d+):?");
     private static final Pattern BAGI = Pattern.compile("Baris (\\d+) = Baris \\1 / (\\S+?):?");
-    private static final Pattern KOFAKTOR_ADJOIN = Pattern.compile(
-            "C\\[(\\d+)\\]\\[(\\d+)\\] = \\(([+-])\\) \\* det\\(Minor\\) = (\\S+)");
-    private static final Pattern KOFAKTOR_DET = Pattern.compile(
-            "a\\[(\\d+)\\]\\[(\\d+)\\] = (\\S+)\\s*\\|\\s*det\\(Minor\\) = (\\S+)\\s*\\|\\s*C\\[\\d+\\]\\[\\d+\\] = (\\S+)");
+    private static final Pattern KOFAKTOR_ADJOIN = Pattern.compile("C\\[(\\d+)\\]\\[(\\d+)\\] = \\(([+-])\\) \\* det\\(Minor\\) = (\\S+)");
+    private static final Pattern KOFAKTOR_DET = Pattern.compile("a\\[(\\d+)\\]\\[(\\d+)\\] = (\\S+)\\s*\\|\\s*det\\(Minor\\) = (\\S+)\\s*\\|\\s*C\\[\\d+\\]\\[\\d+\\] = (\\S+)");
     private static final Pattern DILEWATI = Pattern.compile("Elemen a\\[(\\d+)\\]\\[(\\d+)\\] = (\\S+), kofaktor dilewati\\.");
-    private static final Pattern CRAMER = Pattern.compile(
-            "det\\(A(\\d+)\\) = (\\S+), x(\\d+) = det\\(A\\d+\\) / det\\(A\\) = (\\S+)");
+    private static final Pattern CRAMER = Pattern.compile("det\\(A(\\d+)\\) = (\\S+), x(\\d+) = det\\(A\\d+\\) / det\\(A\\) = (\\S+)");
     private static final Pattern RUMUS_AKHIR = Pattern.compile("Rumus Akhir: det = (.+)");
-    private static final Pattern DIAGONAL = Pattern.compile(
-            "Determinan = hasil kali diagonal \\(dengan tanda dari tukar baris\\) = (\\S+)");
-    private static final Pattern JUMLAH_BASIS = Pattern.compile(
-            "Jumlah titik N = (\\d+), jumlah knot K = (\\d+), derajat = (\\d+), jumlah basis M = (\\d+)");
+    private static final Pattern DIAGONAL = Pattern.compile("Determinan = hasil kali diagonal \\(dengan tanda dari tukar baris\\) = (\\S+)");
+    private static final Pattern JUMLAH_BASIS = Pattern.compile("Jumlah titik N = (\\d+), jumlah knot K = (\\d+), derajat = (\\d+), jumlah basis M = (\\d+)");
     private static final Pattern TRANSFORMASI = Pattern.compile("Transformasi u = \\(x - (\\S+)\\) / (\\S+) (.*)");
     private static final Pattern KNOT = Pattern.compile("Knot x_(\\d+) \\((\\S+)\\) -> S''\\(x\\) = 2 \\* c_(\\d+) = (\\S+)");
     private static final Pattern SEGMEN = Pattern.compile("Segmen (\\d+) \\[(\\S+) <= x <= (\\S+)\\]:");
@@ -77,13 +72,11 @@ public final class StepFormatter {
             rumus(hasil, "R_{" + i + "}" + PANAH_KIRI + pecahan + " R_{" + i + "}");
         } else if ((m = KOFAKTOR_ADJOIN.matcher(s)).matches()) {
             String ij = indeks(m.group(1), m.group(2));
-            rumus(hasil, "C_{" + ij + "} = (" + MINUS + "1)^{" + m.group(1) + "+" + m.group(2) + "}" + KALI
-                    + "det(M_{" + ij + "}) = " + angka(m.group(4)));
+            rumus(hasil, "C_{" + ij + "} = (" + MINUS + "1)^{" + m.group(1) + "+" + m.group(2) + "}" + KALI + "det(M_{" + ij + "}) = " + angka(m.group(4)));
         } else if ((m = KOFAKTOR_DET.matcher(s)).matches()) {
             String ij = indeks(m.group(1), m.group(2));
             rumus(hasil, "a_{" + ij + "} = " + angka(m.group(3)) + ",     det(M_{" + ij + "}) = " + angka(m.group(4)));
-            rumus(hasil, "C_{" + ij + "} = (" + MINUS + "1)^{" + m.group(1) + "+" + m.group(2) + "}" + KALI
-                    + "det(M_{" + ij + "}) = " + angka(m.group(5)));
+            rumus(hasil, "C_{" + ij + "} = (" + MINUS + "1)^{" + m.group(1) + "+" + m.group(2) + "}" + KALI + "det(M_{" + ij + "}) = " + angka(m.group(5)));
         } else if ((m = DILEWATI.matcher(s)).matches()) {
             rumus(hasil, "a_{" + indeks(m.group(1), m.group(2)) + "} = " + angka(m.group(3)));
             teks(hasil, "elemen bernilai nol, jadi kofaktornya tidak perlu dihitung");
@@ -98,14 +91,12 @@ public final class StepFormatter {
             teks(hasil, "Determinan = hasil kali elemen diagonal, tandanya berganti setiap tukar baris:");
             rumus(hasil, "det(A) = " + angka(m.group(1)));
         } else if ((m = JUMLAH_BASIS.matcher(s)).matches()) {
-            rumus(hasil, "N = " + m.group(1) + ",     K = " + m.group(2) + ",     derajat d = " + m.group(3)
-                    + ",     M = d + 1 + K = " + m.group(4));
+            rumus(hasil, "N = " + m.group(1) + ",     K = " + m.group(2) + ",     derajat d = " + m.group(3) + ",     M = d + 1 + K = " + m.group(4));
         } else if ((m = TRANSFORMASI.matcher(s)).matches()) {
             rumus(hasil, "u = \\frac{x " + MINUS + " " + angka(m.group(1)) + "}{" + angka(m.group(2)) + "}");
             teks(hasil, m.group(3));
         } else if ((m = KNOT.matcher(s)).matches()) {
-            rumus(hasil, "S''(x_{" + m.group(1) + "}) = 2c_{" + m.group(3) + "} = " + angka(m.group(4))
-                    + ",     x_{" + m.group(1) + "} = " + angka(m.group(2)));
+            rumus(hasil, "S''(x_{" + m.group(1) + "}) = 2c_{" + m.group(3) + "} = " + angka(m.group(4)) + ",     x_{" + m.group(1) + "} = " + angka(m.group(2)));
         } else if ((m = SEGMEN.matcher(s)).matches()) {
             rumus(hasil, "Segmen " + m.group(1) + ":   " + angka(m.group(2)) + " ≤ x ≤ " + angka(m.group(3)));
         } else if ((m = KOEFISIEN_U.matcher(s)).matches()) {
@@ -135,10 +126,7 @@ public final class StepFormatter {
         if (s.startsWith("Matriks") || s.startsWith("Vektor") || s.startsWith("X^T")) return "MATRIKS";
         return "";
     }
-
-    // ===================== aturan umum =====================
-
-    /** Baris tanpa aturan khusus: dipisah menjadi keterangan dan rumus kalau memungkinkan. */
+    /** Baris tanpa aturan khusus dipisah menjadi keterangan dan rumus kalau memungkinkan. */
     private static void formatUmum(List<Baris> hasil, String s) {
         String bullet = "";
         if (s.startsWith("- ")) {
@@ -173,8 +161,7 @@ public final class StepFormatter {
         s = s.replaceAll("(\\d)\\*(?=[A-Za-z(])", "$1");
         s = s.replace(" * ", KALI).replace("*", KALI);
         // indeks: a[1][2] -> a_{12}, h[0] -> h_{0}, c_0 -> c_{0}, x1 -> x_{1}
-        s = gantiSemua(s, Pattern.compile("(?<![A-Za-z])([A-Za-z])\\[(\\d+)\\]\\[(\\d+)\\]"),
-                m -> m.group(1) + "_{" + indeks(m.group(2), m.group(3)) + "}");
+        s = gantiSemua(s, Pattern.compile("(?<![A-Za-z])([A-Za-z])\\[(\\d+)\\]\\[(\\d+)\\]"), m -> m.group(1) + "_{" + indeks(m.group(2), m.group(3)) + "}");
         s = s.replaceAll("(?<![A-Za-z])([A-Za-z])\\[(\\d+)\\]", "$1_{$2}");
         s = s.replaceAll("(?<![A-Za-z])([A-Za-z])_(\\d+)", "$1_{$2}");
         s = s.replaceAll("(?<![A-Za-z])([A-Za-z])(\\d+)\\b", "$1_{$2}");

@@ -28,11 +28,7 @@ public class SplPage extends FeaturePage {
     });
 
     public SplPage() {
-        super("SISTEM PERSAMAAN LINIER",
-              "Atur jumlah persamaan dan variabel, lalu isi koefisien tiap persamaan. "
-              + "Desimal boleh pakai titik atau koma. Input manual maksimal 11 variabel, "
-              + "file .txt sampai 1001 variabel.",
-              new MatrixInput(MatrixInput.Gaya.PERSAMAAN, 3, 3, 11, 11));
+        super("SISTEM PERSAMAAN LINIER", "Atur jumlah persamaan dan variabel, lalu isi koefisien tiap persamaan. " + "Desimal boleh pakai titik atau koma. Input manual maksimal 11 variabel, " + "file .txt sampai 1001 variabel.", new MatrixInput(MatrixInput.Gaya.PERSAMAAN, 3, 3, 11, 11));
         ThemedUI.gayakan(pilihanMetode);
         tambahBarisOpsi(Theme.label("Metode:"), pilihanMetode);
     }
