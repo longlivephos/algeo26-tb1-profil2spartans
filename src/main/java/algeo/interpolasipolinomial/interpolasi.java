@@ -1,5 +1,7 @@
 package algeo.interpolasipolinomial;
 
+import java.util.List;
+
 import algeo.core.interpolasi.InterpolasiResult;
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
@@ -7,16 +9,10 @@ import algeo.inverse.Augmentasi;
 import algeo.inverse.InverseResult;
 import algeo.inverse.InverseSolverOutput;
 
-public class interpolasi {
-    /**
-     * Menghitung koefisien polinomial dari sekumpulan titik (x, y).
-     *
-     * @param xData Array berisi nilai x dari titik koordinat.
-     * @param yData Array berisi nilai y dari titik koordinat.
-     * @return Objek InterpolasiResult berisi status keberhasilan dan koefisien.
-     */
-    public static InterpolasiResult hitungInterpolasi(double[] xData, double[] yData) {
-        // 1. Validasi Input
+public class Interpolasi { 
+
+    // Menghitung koefisien polinomial dengan pencatatan langkah penyelesaian.
+    public static InterpolasiResult hitungInterpolasi(double[] xData, double[] yData, List<String> steps) {
         if (xData == null || yData == null) {
             return InterpolasiResult.failed("Data x atau y tidak boleh kosong (null).");
         }
@@ -28,10 +24,16 @@ public class interpolasi {
         if (n == 0) {
             return InterpolasiResult.failed("Data titik tidak boleh kosong.");
         }
+        // Batas maksimal 10 titik
+        if (n > 10) {
+            return InterpolasiResult.failed("Batas maksimal titik adalah 10 untuk menjaga stabilitas Matriks Vandermonde.");
+        }
 
         try {
-            // 2. Membentuk Matriks Vandermonde (A)
-            // Persamaan: a_0(x^0) + a_1(x^1) + ... + a_n(x^n) = y
+            if (steps != null) {
+                steps.add("Membentuk Matriks Vandermonde (A) dari " + n + " titik koordinat...");
+            }
+            
             double[][] vandermondeData = new double[n][n];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -39,37 +41,53 @@ public class interpolasi {
                 }
             }
             Matrix matriksA = new Matrix(vandermondeData);
+            
+            if (steps != null) {
+                steps.add("Matriks Vandermonde (A) yang terbentuk:\n" + matriksA.toString());
+                steps.add("Mencari Invers Matriks A (A^-1) menggunakan metode Augmentasi (OBE)...");
+            }
 
-            // 3. Memecahkan SPL dengan Mencari Invers Matriks Vandermonde (A^-1)
-            // Menggunakan metode Augmentasi (OBE) buatan rekan tim agar lebih stabil
             InverseSolverOutput outputInvers = Augmentasi.hitungInversAugmentasi(matriksA);
             
             if (outputInvers.getResult().getType() == InverseResult.ResultType.NO_INVERSE) {
-                return InterpolasiResult.failed("Gagal menghitung: Matriks titik-titik tidak memiliki invers (mungkin terdapat nilai x yang duplikat).");
+                return InterpolasiResult.failed("Gagal menghitung: Matriks titik-titik tidak memiliki invers.");
             }
 
             Matrix invA = outputInvers.getResult().getInverse();
+            
+            if (steps != null) {
+                steps.add("Matriks Invers (A^-1) berhasil didapatkan:\n" + invA.toString());
+                steps.add("Mengalikan A^-1 dengan Matriks Y untuk mendapatkan Koefisien (C = A^-1 * Y)...");
+            }
 
-            // 4. Mengalikan Invers(A) dengan Matriks Y untuk mendapatkan Koefisien (C = A^-1 * Y)
-            // Hasilnya disimpan dalam matriks kolom [n][1]
             double[][] koefisien = new double[n][1];
             for (int i = 0; i < n; i++) {
                 double sum = 0;
                 for (int j = 0; j < n; j++) {
-                    // Perkalian baris ke-i dari invA dengan nilai yData[j]
                     sum += invA.get(i, j) * yData[j]; 
                 }
                 koefisien[i][0] = sum;
             }
 
-            // 5. Mengembalikan hasil sukses
+            if (steps != null) {
+                steps.add("Perkalian selesai. Deret koefisien polinomial berhasil ditemukan.");
+            }
+
             return InterpolasiResult.success(koefisien, xData, yData);
 
         } catch (MatrixException e) {
             return InterpolasiResult.failed("Terjadi kesalahan pada struktur matriks: " + e.getMessage());
         } catch (Exception e) {
-            return InterpolasiResult.failed("Terjadi error sistem saat komputasi interpolasi: " + e.getMessage());
+            return InterpolasiResult.failed("Terjadi error sistem: " + e.getMessage());
         }
     }
+
+    // Mengevaluasi fungsi P(x) untuk suatu nilai x yang baru.
+    public static double taksirNilaiPolinomial(double[][] koefisien, double xTarget) {
+        double hasil = 0;
+        for (int i = 0; i < koefisien.length; i++) {
+            hasil += koefisien[i][0] * Math.pow(xTarget, i);
+        }
+        return hasil;
+    }
 }
-    
