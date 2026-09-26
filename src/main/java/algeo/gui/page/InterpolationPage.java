@@ -36,10 +36,7 @@ public class InterpolationPage extends FeaturePage {
     private StringBuilder hasilEvaluasi = new StringBuilder();
 
     public InterpolationPage() {
-        super("INTERPOLASI POLINOMIAL",
-              "Isi titik sampel (x, y), maksimal 10 titik. Setelah HITUNG, "
-              + "masukkan nilai xt lalu tekan EVALUASI untuk menaksir P(xt).",
-              new MatrixInput(MatrixInput.Gaya.TITIK, 4, 2, 10, 2));
+        super("INTERPOLASI POLINOMIAL", "Isi titik sampel (x, y), maksimal 10 titik. Setelah HITUNG, " + "masukkan nilai xt lalu tekan EVALUASI untuk menaksir P(xt).", new MatrixInput(MatrixInput.Gaya.TITIK, 4, 2, 10, 2));
         Theme.gayakan(fieldXt);
         PixelButton tombolEvaluasi = new PixelButton("EVALUASI", Theme.BIRU, Theme.BIRU_TUA);
         tombolEvaluasi.addActionListener(e -> amanJalankan(this::evaluasi));
@@ -93,8 +90,7 @@ public class InterpolationPage extends FeaturePage {
 
     private String susunTeks() {
         String domain = "[" + NumberFormatter.teks(xMin) + ", " + NumberFormatter.teks(xMax) + "]";
-        return OutputWriter.teksInterpolasi(NAMA_METODE, titik, langkah, hasil, domain,
-                persamaan, hasilEvaluasi.toString());
+        return OutputWriter.teksInterpolasi(NAMA_METODE, titik, langkah, hasil, domain, persamaan, hasilEvaluasi.toString());
     }
 
     @Override

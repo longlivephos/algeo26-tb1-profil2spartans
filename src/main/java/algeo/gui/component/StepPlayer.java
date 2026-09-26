@@ -169,8 +169,6 @@ public class StepPlayer extends JPanel {
         perbaruiIndikator();
     }
 
-    // ===================== kontrol =====================
-
     private int jeda() {
         return 1100 - sliderKecepatan.getValue() * 100; // 1000 ms (lambat) sampai 100 ms (cepat)
     }
@@ -231,8 +229,7 @@ public class StepPlayer extends JPanel {
         adaHasil = true;
         String teks = hasil.stripTrailing();
         if (teks.length() > BATAS_TEKS_HASIL) {
-            teks = teks.substring(0, BATAS_TEKS_HASIL)
-                    + "\n... (hasil terlalu panjang, simpan ke file untuk melihat semuanya)";
+            teks = teks.substring(0, BATAS_TEKS_HASIL) + "\n... (hasil terlalu panjang, simpan ke file untuk melihat semuanya)";
         }
         String judul = status.isEmpty() ? "HASIL" : "HASIL - " + status;
         tambahKomponen(buatKartu(judul, Theme.KUNING, teks, false));

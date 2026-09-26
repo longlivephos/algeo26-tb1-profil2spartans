@@ -37,8 +37,6 @@ public class MatrixInput extends JPanel {
     private final int maksKolom;
     private final Stepper hitungBaris;
     private final Stepper hitungKolom;
-
-    // isi berganti antara kotak-kotak, teks, atau info file (hanya satu yang dipasang)
     private final JPanel isi = new JPanel(new BorderLayout());
     private final JPanel kiriSel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     private final JScrollPane scrollTeks;
@@ -72,8 +70,6 @@ public class MatrixInput extends JPanel {
         hitungKolom = new Stepper(kolom, 1, maksKolom);
         hitungBaris.setSaatBerubah(this::bangunUlang);
         hitungKolom.setSaatBerubah(this::bangunUlang);
-
-        // ----- baris pengatur ukuran -----
         barisUkuran.setOpaque(false);
         switch (gaya) {
             case PERSAMAAN:
@@ -98,7 +94,6 @@ public class MatrixInput extends JPanel {
                 break;
         }
 
-        // ----- tab mode (knot tidak perlu, angkanya sedikit) -----
         JPanel atas = new JPanel(new BorderLayout(0, 8));
         atas.setOpaque(false);
         if (gaya != Gaya.KNOT) {
@@ -115,7 +110,6 @@ public class MatrixInput extends JPanel {
         }
         atas.add(barisUkuran, BorderLayout.SOUTH);
 
-        // ----- isi: kartu per angka / teks / file -----
         panelSel.setOpaque(false);
         kiriSel.setOpaque(false);
         kiriSel.add(panelSel);
@@ -183,10 +177,7 @@ public class MatrixInput extends JPanel {
         return new Matrix(data);
     }
 
-    /**
-     * Mengisi input dari matriks hasil baca file. Kalau melebihi batas input manual,
-     * matriks dipakai langsung tanpa ditampilkan.
-     */
+    /* Mengisi input dari matriks hasil baca file. Kalau melebihi batas input manual, matriks dipakai langsung tanpa ditampilkan. */
     public void muatMatriks(Matrix m, String namaFile) throws MatrixException {
         if (!periksaUkuran(m, true)) {
             matriksFile = m;
@@ -224,8 +215,6 @@ public class MatrixInput extends JPanel {
         }
         gantiMode(modeTeks);
     }
-
-    // ===================== mode dan ukuran =====================
 
     private void gantiMode(boolean keTeks) {
         if (matriksFile == null && keTeks != modeTeks) {
@@ -291,9 +280,7 @@ public class MatrixInput extends JPanel {
         }
         boolean muat = m.getRows() <= maksBaris && kolomData <= maksKolom;
         if (!muat && (!bolehBesar || gaya == Gaya.TITIK)) {
-            throw new MatrixException("Input manual dibatasi " + maksBaris + " baris dan " + maksKolom
-                    + (gaya == Gaya.PERSAMAAN ? " variabel" : " kolom")
-                    + ". Untuk ukuran lebih besar gunakan BUKA FILE.");
+            throw new MatrixException("Input manual dibatasi " + maksBaris + " baris dan " + maksKolom + (gaya == Gaya.PERSAMAAN ? " variabel" : " kolom") + ". Untuk ukuran lebih besar gunakan BUKA FILE.");
         }
         return muat;
     }
@@ -408,8 +395,6 @@ public class MatrixInput extends JPanel {
         }
         labelStatus.setText(teks);
     }
-
-    // ===================== label dan konversi =====================
 
     private String labelDepan(int i, int j) {
         switch (gaya) {

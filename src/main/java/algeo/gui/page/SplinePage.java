@@ -33,10 +33,7 @@ public class SplinePage extends FeaturePage {
     private StringBuilder hasilEvaluasi = new StringBuilder();
 
     public SplinePage() {
-        super("NATURAL CUBIC SPLINE",
-              "Isi titik sampel (x, y) dengan x terurut naik, minimal 2 dan maksimal 10 titik. "
-              + "Setelah HITUNG, masukkan xt lalu tekan EVALUASI untuk menghitung S(xt).",
-              new MatrixInput(MatrixInput.Gaya.TITIK, 5, 2, 10, 2));
+        super("NATURAL CUBIC SPLINE", "Isi titik sampel (x, y) dengan x terurut naik, minimal 2 dan maksimal 10 titik. " + "Setelah HITUNG, masukkan xt lalu tekan EVALUASI untuk menghitung S(xt).", new MatrixInput(MatrixInput.Gaya.TITIK, 5, 2, 10, 2));
         Theme.gayakan(fieldXt);
         PixelButton tombolEvaluasi = new PixelButton("EVALUASI", Theme.BIRU, Theme.BIRU_TUA);
         tombolEvaluasi.addActionListener(e -> amanJalankan(this::evaluasi));
@@ -88,8 +85,7 @@ public class SplinePage extends FeaturePage {
 
     private String susunTeks() {
         String domain = "[" + NumberFormatter.teks(x[0]) + ", " + NumberFormatter.teks(x[x.length - 1]) + "]";
-        return OutputWriter.teksSplineKubik(NAMA_METODE, titik, output.getSteps(), output.getResult(),
-                domain, persamaanSegmen, hasilEvaluasi.toString());
+        return OutputWriter.teksSplineKubik(NAMA_METODE, titik, output.getSteps(), output.getResult(), domain, persamaanSegmen, hasilEvaluasi.toString());
     }
 
     @Override

@@ -35,8 +35,6 @@ public final class Theme {
     public static final Font ANGKA = new Font(Font.MONOSPACED, Font.BOLD, 13);
     public static final Font BIASA = new Font(Font.SANS_SERIF, Font.PLAIN, 13);
     public static final Font BIASA_TEBAL = new Font(Font.SANS_SERIF, Font.BOLD, 13);
-
-    // font pixel "Press Start 2P" (lisensi OFL) disimpan di src/main/resources/fonts
     private static final Font PIXEL = muatFontPixel();
 
     private static Font muatFontPixel() {
@@ -72,9 +70,7 @@ public final class Theme {
         c.setFont(ANGKA);
         c.setBackground(Color.WHITE);
         c.setForeground(TEKS);
-        c.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(PINK_GARIS, 2),
-                BorderFactory.createEmptyBorder(2, 4, 2, 4)));
+        c.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(PINK_GARIS, 2), BorderFactory.createEmptyBorder(2, 4, 2, 4)));
     }
 
     public static void haluskan(Graphics2D g2) {

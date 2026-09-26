@@ -27,8 +27,6 @@ public final class ThemedUI {
 
     private ThemedUI() {}
 
-    // ===================== scrollbar =====================
-
     public static void gayakan(JScrollPane scroll) {
         scroll.getVerticalScrollBar().setUI(new ScrollBarPink());
         scroll.getHorizontalScrollBar().setUI(new ScrollBarPink());
@@ -79,8 +77,6 @@ public final class ThemedUI {
         }
     }
 
-    // ===================== dropdown =====================
-
     public static void gayakan(JComboBox<?> combo) {
         combo.setUI(new ComboPink());
         combo.setFont(Theme.BIASA_TEBAL);
@@ -127,8 +123,6 @@ public final class ThemedUI {
             return b;
         }
     }
-
-    // ===================== slider =====================
 
     public static void gayakan(JSlider slider) {
         slider.setUI(new SliderPink(slider));

@@ -65,16 +65,13 @@ public abstract class FeaturePage extends JPanel {
         setBackground(Theme.LATAR);
         setBorder(BorderFactory.createEmptyBorder(14, 16, 16, 16));
 
-        // ----- atas -----
         tombolKembali.setForeground(Theme.TEKS);
         JPanel atas = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         atas.setOpaque(false);
         atas.add(tombolKembali);
         atas.add(Theme.judul(judul, 20f));
 
-        // ----- kiri: kartu input -----
-        JLabel labelPetunjuk = new JLabel("<html><body style='width:" + (LEBAR_KIRI - 170) + "px'>"
-                + petunjuk + "</body></html>");
+        JLabel labelPetunjuk = new JLabel("<html><body style='width:" + (LEBAR_KIRI - 170) + "px'>" + petunjuk + "</body></html>");
         labelPetunjuk.setFont(Theme.BIASA);
         labelPetunjuk.setForeground(Theme.TEKS);
 
@@ -124,7 +121,6 @@ public abstract class FeaturePage extends JPanel {
         kartuInput.add(barisTombol, BorderLayout.SOUTH);
         kartuInput.setPreferredSize(new Dimension(LEBAR_KIRI, 0));
 
-        // ----- kanan -----
         kanan.setOpaque(false);
         kanan.add(pemutar, BorderLayout.CENTER);
 
@@ -139,8 +135,6 @@ public abstract class FeaturePage extends JPanel {
     public void setAksiKembali(Runnable aksi) {
         tombolKembali.addActionListener(e -> aksi.run());
     }
-
-    // ===================== dipakai halaman turunan =====================
 
     /** Menambah satu baris komponen di bawah input (misal pilihan metode). */
     protected void tambahBarisOpsi(JComponent... isi) {
@@ -236,9 +230,7 @@ public abstract class FeaturePage extends JPanel {
         for (double v : a) hasil = Math.max(hasil, v);
         return hasil;
     }
-
-    // ===================== bagian dalam =====================
-
+    
     private static void tambahRataKiri(JPanel wadah, JComponent c) {
         c.setAlignmentX(Component.LEFT_ALIGNMENT);
         wadah.add(c);

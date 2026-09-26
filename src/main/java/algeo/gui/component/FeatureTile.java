@@ -6,8 +6,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Shape;
 
 import javax.swing.JButton;
@@ -70,7 +70,7 @@ public class FeatureTile extends JButton {
         g2.setColor(Theme.PINK_GARIS);
         g2.drawString(judul, 52, 42 + naik);
 
-        // penjelasan, dipotong per kata supaya muat
+        // penjelasan
         g2.setFont(Theme.BIASA.deriveFont(15f));
         g2.setColor(Theme.TEKS);
         FontMetrics fm = g2.getFontMetrics();
@@ -88,7 +88,6 @@ public class FeatureTile extends JButton {
         }
         g2.drawString(baris.toString(), 22, y);
 
-        // keterangan kecil di pojok kiri bawah, misalnya "4 METODE"
         g2.setFont(Theme.pixel(8f));
         fm = g2.getFontMetrics();
         int lebarChip = fm.stringWidth(keterangan) + 16;
