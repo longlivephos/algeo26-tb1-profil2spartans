@@ -11,7 +11,9 @@ public class MenuUtama implements Module {
         Module splModule = new SPLModule();
         Module determinanModule = new DeterminanModule();
         Module inversModule = new InversModule();
-        // TODO: modul interpolasi/spline/regresi
+        Module interpolasiModule = new ModuleInterpolasi();
+        Module splineModule = new ModuleSplineKubik();
+        Module regresiSplineModule = new ModuleRegresiSplineKubik();
 
         while (jalan) {
             System.out.println();
@@ -31,11 +33,9 @@ public class MenuUtama implements Module {
                     case "1": splModule.jalankan(sc); break;
                     case "2": determinanModule.jalankan(sc); break;
                     case "3": inversModule.jalankan(sc); break;
-                    case "4":
-                    case "5":
-                    case "6":
-                        System.out.println("Lagi dikerjain, sabar yah~");
-                        break;
+                    case "4": interpolasiModule.jalankan(sc); break;
+                    case "5": splineModule.jalankan(sc); break;
+                    case "6": regresiSplineModule.jalankan(sc); break;
                     case "7":
                         jalan = false;
                         System.out.println("Bye bye ^__^");
