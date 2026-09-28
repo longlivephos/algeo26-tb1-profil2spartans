@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import algeo.core.interpolasi.InterpolasiResult;
 import algeo.core.matrix.Matrix;
+import algeo.core.util.DecimalParser;
 import algeo.core.util.NumberFormatter;
 import algeo.interpolasipolinomial.Interpolasi;
 import algeo.io.MatrixReader;
@@ -104,7 +105,7 @@ public class ModuleInterpolasi implements Module {
                     } else if (jawab.equalsIgnoreCase("y")) {
                         System.out.print("Masukkan nilai xt: ");
                         try {
-                            double xTarget = Double.parseDouble(scanner.nextLine());
+                            double xTarget = DecimalParser.parse(scanner.nextLine().trim());
                             
                             // Peringatan jika nilai di luar domain 
                             if (xTarget < minX || xTarget > maxX) {
