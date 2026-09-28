@@ -1,186 +1,261 @@
 package algeo.gui.page;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.util.DecimalParser;
-import algeo.gui.component.CardPanel;
+import algeo.gui.component.LangkahPanel;
 import algeo.gui.component.MatrixInput;
-import algeo.gui.component.MessageDialog;
-import algeo.gui.component.PixelButton;
 import algeo.gui.component.PlotPanel;
-import algeo.gui.component.StepPlayer;
-import algeo.gui.theme.Theme;
-import algeo.gui.theme.ThemedUI;
 import algeo.io.MatrixReader;
 import algeo.io.OutputWriter;
 
-/**
- * Kerangka halaman fitur: panel input di kiri, langkah dan hasil di kanan. Subclass cukup mengimplementasikan hitung().
- */
 public abstract class FeaturePage extends JPanel {
 
-    /** Aksi tombol yang boleh melempar exception, supaya error ditangani di satu tempat. */
-    protected interface Aksi {
-        void jalankan() throws Exception;
-    }
+    private static final int JEDA = 500; // jeda antar langkah komputasinya (ms)
 
-    private static final int LEBAR_KIRI = 500;
+    protected MatrixInput input;
 
-    protected final MatrixInput grid;
-    protected final StepPlayer pemutar = new StepPlayer();
+    private JPanel panelOpsi = new JPanel();
+    private JPanel panelKanan = new JPanel(new BorderLayout(0, 5));
+    private JPanel panelLangkah = new JPanel();
+    private JScrollPane scrollLangkah;
+    private JLabel labelIndikator = new JLabel(" ");
+    private JButton tombolHitung = new JButton("Hitung");
 
-    private final JPanel panelOpsi = new JPanel();
-    private final JPanel kanan = new JPanel(new BorderLayout());
-    private final PixelButton tombolKembali = new PixelButton("< MENU", Theme.KUNING, Theme.KUNING_TUA);
+    private Timer timer;
+    private List<String> langkah = new ArrayList<>();
+    private int indeks = 0;
+    private int jumlahTukar = 0;
+    private int jumlahOperasi = 0;
+    private String teksHasil = "";
+    private double[][] matriksSebelum = null;
+    protected boolean sedangJalan = false;
 
-    // teks lengkap (metode, input, langkah, hasil) untuk disimpan ke .txt
-    private String teksLengkap = "";
+    protected String teksLengkap = "";
 
-    public FeaturePage(String judul, String petunjuk, MatrixInput grid) {
-        super(new BorderLayout(14, 14));
-        this.grid = grid;
-        setBackground(Theme.LATAR);
-        setBorder(BorderFactory.createEmptyBorder(14, 16, 16, 16));
+    public FeaturePage(MatrixInput input) {
+        super(new BorderLayout(10, 10));
+        this.input = input;
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        tombolKembali.setForeground(Theme.TEKS);
-        JPanel atas = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
-        atas.setOpaque(false);
-        atas.add(tombolKembali);
-        atas.add(Theme.judul(judul, 20f));
+        JButton tombolBuka = new JButton("Buka File");
+        JButton tombolSimpan = new JButton("Simpan");
+        JButton tombolReset = new JButton("Reset");
 
-        JLabel labelPetunjuk = new JLabel("<html><body style='width:" + (LEBAR_KIRI - 170) + "px'>" + petunjuk + "</body></html>");
-        labelPetunjuk.setFont(Theme.BIASA);
-        labelPetunjuk.setForeground(Theme.TEKS);
-
-        panelOpsi.setLayout(new BoxLayout(panelOpsi, BoxLayout.Y_AXIS));
-        panelOpsi.setOpaque(false);
-
-        // petunjuk, input, dan opsi ikut digulir; tombol tetap di bawah
-        JPanel isiKiri = new JPanel();
-        isiKiri.setLayout(new BoxLayout(isiKiri, BoxLayout.Y_AXIS));
-        isiKiri.setOpaque(false);
-        tambahRataKiri(isiKiri, labelPetunjuk);
-        isiKiri.add(Box.createVerticalStrut(10));
-        tambahRataKiri(isiKiri, grid);
-        isiKiri.add(Box.createVerticalStrut(10));
-        tambahRataKiri(isiKiri, panelOpsi);
-
-        JPanel wadahIsi = new JPanel(new BorderLayout());
-        wadahIsi.setOpaque(false);
-        wadahIsi.add(isiKiri, BorderLayout.NORTH);
-        JScrollPane scrollKiri = new JScrollPane(wadahIsi);
-        scrollKiri.setOpaque(false);
-        scrollKiri.getViewport().setOpaque(false);
-        scrollKiri.setBorder(null);
-        ThemedUI.gayakan(scrollKiri);
-
-        PixelButton tombolBuka = new PixelButton("BUKA FILE");
-        PixelButton tombolHitung = new PixelButton("HITUNG", Theme.KUNING, Theme.KUNING_TUA);
-        PixelButton tombolSimpan = new PixelButton("SIMPAN");
-        PixelButton tombolReset = new PixelButton("RESET");
-        tombolHitung.setForeground(Theme.TEKS);
-        tombolBuka.setToolTipText("Baca input dari file .txt");
-        tombolSimpan.setToolTipText("Simpan metode, input, langkah, dan hasil ke file .txt");
-        tombolBuka.addActionListener(e -> amanJalankan(this::bukaFile));
-        tombolHitung.addActionListener(e -> amanJalankan(this::hitung));
-        tombolSimpan.addActionListener(e -> amanJalankan(this::simpanHasil));
+        tombolBuka.addActionListener(e -> {
+            try {
+                bukaFile();
+            } catch (MatrixException ex) {
+                tampilkanError(ex.getMessage());
+            }
+        });
+        tombolHitung.addActionListener(e -> {
+            try {
+                hitung();
+            } catch (MatrixException ex) {
+                tampilkanError(ex.getMessage());
+            } catch (Exception ex) {
+                tampilkanError("Terjadi kesalahan: " + ex.getMessage());
+            }
+        });
+        tombolSimpan.addActionListener(e -> {
+            try {
+                simpanHasil();
+            } catch (IOException ex) {
+                tampilkanError("Gagal menyimpan file: " + ex.getMessage());
+            }
+        });
         tombolReset.addActionListener(e -> reset());
 
-        JPanel barisTombol = new JPanel(new GridLayout(2, 2, 8, 8));
-        barisTombol.setOpaque(false);
-        barisTombol.add(tombolBuka);
-        barisTombol.add(tombolHitung);
-        barisTombol.add(tombolSimpan);
-        barisTombol.add(tombolReset);
+        JPanel panelTombol = new JPanel(new GridLayout(1, 4, 5, 5));
+        panelTombol.add(tombolBuka);
+        panelTombol.add(tombolHitung);
+        panelTombol.add(tombolSimpan);
+        panelTombol.add(tombolReset);
 
-        CardPanel kartuInput = new CardPanel("INPUT", new BorderLayout(0, 12));
-        kartuInput.add(scrollKiri, BorderLayout.CENTER);
-        kartuInput.add(barisTombol, BorderLayout.SOUTH);
-        kartuInput.setPreferredSize(new Dimension(LEBAR_KIRI, 0));
+        panelOpsi.setLayout(new BoxLayout(panelOpsi, BoxLayout.Y_AXIS));
 
-        kanan.setOpaque(false);
-        kanan.add(pemutar, BorderLayout.CENTER);
+        JPanel isiKiri = new JPanel(new BorderLayout(0, 10));
+        isiKiri.add(input, BorderLayout.NORTH);
+        isiKiri.add(panelOpsi, BorderLayout.CENTER);
 
-        add(atas, BorderLayout.NORTH);
-        add(kartuInput, BorderLayout.WEST);
-        add(kanan, BorderLayout.CENTER);
+        JPanel panelKiri = new JPanel(new BorderLayout(0, 10));
+        panelKiri.setBorder(BorderFactory.createTitledBorder("Input"));
+        panelKiri.add(new JScrollPane(isiKiri), BorderLayout.CENTER);
+        panelKiri.add(panelTombol, BorderLayout.SOUTH);
+
+        panelLangkah.setLayout(new BoxLayout(panelLangkah, BoxLayout.Y_AXIS));
+        scrollLangkah = new JScrollPane(panelLangkah);
+        scrollLangkah.getVerticalScrollBar().setUnitIncrement(16);
+        kosongkanLangkah();
+
+        JPanel panelWarna = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+        panelWarna.add(kotakWarna("Baris diubah", LangkahPanel.KUNING));
+        panelWarna.add(kotakWarna("Nilai yang berubah", LangkahPanel.ORANYE));
+        panelWarna.add(kotakWarna("Baris acuan", LangkahPanel.BIRU));
+        panelWarna.add(kotakWarna("Baris ditukar", LangkahPanel.UNGU));
+
+        JPanel panelAtas = new JPanel(new BorderLayout());
+        panelAtas.add(labelIndikator, BorderLayout.NORTH);
+        panelAtas.add(panelWarna, BorderLayout.SOUTH);
+
+        panelKanan.setBorder(BorderFactory.createTitledBorder("Langkah dan Hasil"));
+        panelKanan.add(panelAtas, BorderLayout.NORTH);
+        panelKanan.add(scrollLangkah, BorderLayout.CENTER);
+
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelKiri, panelKanan);
+        split.setDividerLocation(450);
+        add(split, BorderLayout.CENTER);
+
+        timer = new Timer(JEDA, e -> tampilkanLangkahBerikut());
     }
 
-    /** Diisi setiap halaman: baca input, panggil library, lalu tampilkanProses(...). */
     protected abstract void hitung() throws MatrixException;
-
-    public void setAksiKembali(Runnable aksi) {
-        tombolKembali.addActionListener(e -> aksi.run());
-    }
-
-    /** Menambah satu baris komponen di bawah input (misal pilihan metode). */
-    protected void tambahBarisOpsi(JComponent... isi) {
-        JPanel baris = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
-        baris.setOpaque(false);
-        for (JComponent c : isi) {
-            baris.add(c);
+    protected void tambahOpsi(JComponent... komponen) {
+        JPanel baris = new JPanel();
+        for (JComponent k : komponen) {
+            baris.add(k);
         }
-        tambahRataKiri(panelOpsi, baris);
+        panelOpsi.add(baris);
     }
 
-    /** Area kanan dibagi dua: grafik di atas, langkah di bawah. */
+    // nampilin grafik untuk interpolasi, spline, dan regresi
     protected void tambahGrafik(PlotPanel grafik) {
-        kanan.remove(pemutar);
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, grafik, pemutar);
-        split.setUI(new BasicSplitPaneUI()); // pembatas polos tanpa titik-titik bawaan
-        ((BasicSplitPaneUI) split.getUI()).getDivider().setBorder(null);
-        split.setResizeWeight(0.45);
-        split.setBorder(null);
-        split.setOpaque(false);
-        split.setDividerSize(12);
-        kanan.add(split, BorderLayout.CENTER);
+        panelKanan.remove(scrollLangkah);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, grafik, scrollLangkah);
+        split.setResizeWeight(0.5);
+        panelKanan.add(split, BorderLayout.CENTER);
     }
 
-    /**
-     * Menjalankan animasi langkah lalu menampilkan hasil.
-     * @param langkah langkah dari library
-     * @param teksLengkap teks dari OutputWriter (juga yang disimpan ke file)
-     * @param status ringkasan singkat untuk badge hasil, boleh kosong
-     * @param saatSelesai dijalankan setelah hasil muncul, boleh null
-     */
-    protected void tampilkanProses(List<String> langkah, String teksLengkap, String status, Runnable saatSelesai) {
+    protected void mulaiTampilkan(List<String> daftarLangkah, String teksLengkap) {
+        timer.stop();
+        this.langkah = daftarLangkah;
         this.teksLengkap = teksLengkap;
-        pemutar.putar(langkah, ambilBagianHasil(teksLengkap), status, saatSelesai);
+        this.teksHasil = ambilBagianHasil(teksLengkap);
+        indeks = 0;
+        jumlahTukar = 0;
+        jumlahOperasi = 0;
+        sedangJalan = true;
+        tombolHitung.setEnabled(false);
+
+        matriksSebelum = null;
+        panelLangkah.removeAll();
+        perbaruiIndikator();
+        timer.start();
     }
 
-    /** Dipakai setelah evaluasi xt supaya file yang disimpan ikut memuat hasil evaluasi. */
-    protected void perbaruiTeksLengkap(String teksLengkap) {
-        this.teksLengkap = teksLengkap;
+    private void tampilkanLangkahBerikut() {
+        if (indeks < langkah.size()) {
+            String s = langkah.get(indeks);
+            String judul = "Langkah " + (indeks + 1);
+            if (s.startsWith("Tukar baris")) {
+                jumlahTukar++;
+                judul = judul + " Tukar Baris";
+            } else if (s.startsWith("Baris ") && s.contains(" = Baris ")) {
+                jumlahOperasi++;
+                judul = judul + " Operasi Baris";
+            }
+            LangkahPanel panel = new LangkahPanel(judul, s, matriksSebelum, new Color(255, 245, 250));
+            if (panel.getMatriks() != null) {
+                matriksSebelum = panel.getMatriks();
+            }
+            tambahPanel(panel);
+            indeks++;
+            perbaruiIndikator();
+        } else {
+            timer.stop();
+            sedangJalan = false;
+            tombolHitung.setEnabled(true);
+            String hasil = teksHasil;
+            if (hasil.length() > 20000) {
+                hasil = hasil.substring(0, 20000) + "\n... (hasil terlalu panjang, cobalah simpan ke file untuk melihat semuanya)";
+            }
+            tambahPanel(new LangkahPanel("HASIL", hasil, null, new Color(255, 250, 215)));
+        }
     }
 
-    /** Membaca satu angka dari text field (titik atau koma sebagai desimal). */
+    private void tambahPanel(JPanel panel) {
+        panelLangkah.add(panel);
+        panelLangkah.add(Box.createVerticalStrut(6));
+        panelLangkah.revalidate();
+        panelLangkah.repaint();
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar bar = scrollLangkah.getVerticalScrollBar();
+            bar.setValue(bar.getMaximum());
+        });
+    }
+
+    private static JLabel kotakWarna(String teks, Color warna) {
+        JLabel label = new JLabel(teks);
+        label.setOpaque(true);
+        label.setBackground(warna);
+        label.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(2, 6, 2, 6)));
+        return label;
+    }
+    private void kosongkanLangkah() {
+        panelLangkah.removeAll();
+        // panelLangkah.add(new JLabel("Isi input lalu tekan Hitung"));
+        panelLangkah.revalidate();
+        panelLangkah.repaint();
+    }
+
+    private void perbaruiIndikator() {
+        labelIndikator.setText("<html>Langkah " + indeks + "/" + langkah.size() + "<br>Tukar baris: " + jumlahTukar + "<br>Operasi baris: " + jumlahOperasi + "</html>");
+    }
+
+    protected void tambahKeOutput(String baris) {
+        tambahPanel(new LangkahPanel("Evaluasi", baris, null, new Color(215, 240, 215)));
+    }
+
+    protected void reset() {
+        timer.stop();
+        sedangJalan = false;
+        tombolHitung.setEnabled(true);
+        input.kosongkan();
+        kosongkanLangkah();
+        matriksSebelum = null;
+        langkah = new ArrayList<>();
+        indeks = 0;
+        jumlahTukar = 0;
+        jumlahOperasi = 0;
+        teksLengkap = "";
+        labelIndikator.setText(" ");
+    }
+
+    protected void tampilkanError(String pesan) {
+        JOptionPane.showMessageDialog(this, pesan, "Kesalahan", JOptionPane.ERROR_MESSAGE);
+    }
+
+    // membaca satu angka dari text field
     protected static double bacaAngka(JTextField field, String nama) throws MatrixException {
         String isi = field.getText().trim();
         if (isi.isEmpty()) {
-            throw new MatrixException("Isi nilai " + nama + " dulu.");
+            throw new MatrixException("Nilai " + nama + " belum diisi");
         }
         try {
             return DecimalParser.parse(isi);
@@ -189,29 +264,7 @@ public abstract class FeaturePage extends JPanel {
         }
     }
 
-    protected void reset() {
-        grid.kosongkan();
-        pemutar.kosongkan();
-        teksLengkap = "";
-    }
-
-    /** Menjalankan aksi tombol; semua exception ditampilkan sebagai dialog, program tidak crash. */
-    protected void amanJalankan(Aksi aksi) {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        try {
-            aksi.jalankan();
-        } catch (MatrixException | NumberFormatException e) {
-            MessageDialog.tampilkan(this, "KESALAHAN", e.getMessage());
-        } catch (IOException e) {
-            MessageDialog.tampilkan(this, "KESALAHAN", "Gagal membaca atau menyimpan file: " + e.getMessage());
-        } catch (Exception e) {
-            MessageDialog.tampilkan(this, "KESALAHAN", "Terjadi kesalahan tak terduga: " + e);
-        } finally {
-            setCursor(Cursor.getDefaultCursor());
-        }
-    }
-
-    protected static double[] kolom(Matrix m, int j) {
+    protected static double[] ambilKolom(Matrix m, int j) {
         double[] hasil = new double[m.getRows()];
         for (int i = 0; i < m.getRows(); i++) {
             hasil[i] = m.get(i, j);
@@ -219,47 +272,54 @@ public abstract class FeaturePage extends JPanel {
         return hasil;
     }
 
-    protected static double min(double[] a) {
+    protected static double cariMin(double[] a) {
         double hasil = a[0];
-        for (double v : a) hasil = Math.min(hasil, v);
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] < hasil) hasil = a[i];
+        }
         return hasil;
     }
 
-    protected static double max(double[] a) {
+    protected static double cariMax(double[] a) {
         double hasil = a[0];
-        for (double v : a) hasil = Math.max(hasil, v);
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] > hasil) hasil = a[i];
+        }
         return hasil;
     }
-    
-    private static void tambahRataKiri(JPanel wadah, JComponent c) {
-        c.setAlignmentX(Component.LEFT_ALIGNMENT);
-        wadah.add(c);
+
+    protected static double[] buatSampelX(double a, double b) {
+        int n = 200;
+        double[] x = new double[n + 1];
+        for (int i = 0; i <= n; i++) {
+            x[i] = a + (b - a) * i / n;
+        }
+        return x;
     }
 
     private static String ambilBagianHasil(String teks) {
         int posisi = teks.lastIndexOf("\nHasil:\n");
-        return (posisi >= 0) ? teks.substring(posisi + "\nHasil:\n".length()) : teks;
+        if (posisi >= 0) {
+            return teks.substring(posisi + "\nHasil:\n".length());
+        }
+        return teks;
     }
 
     private void bukaFile() throws MatrixException {
-        File folderAwal = new File("test").isDirectory() ? new File("test") : new File(".");
-        JFileChooser chooser = new JFileChooser(folderAwal);
-        chooser.setFileFilter(new FileNameExtensionFilter("File teks (*.txt)", "txt"));
+        JFileChooser chooser = new JFileChooser(new File("test"));
         if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        File file = chooser.getSelectedFile();
-        Matrix m = MatrixReader.bacaFile(file.getPath());
-        grid.muatMatriks(m, file.getName());
+        Matrix m = MatrixReader.bacaFile(chooser.getSelectedFile().getPath());
+        input.muatMatriks(m);
     }
 
     private void simpanHasil() throws IOException {
         if (teksLengkap.isEmpty()) {
-            MessageDialog.tampilkan(this, "BELUM ADA HASIL", "Tekan HITUNG dulu sebelum menyimpan.");
+            tampilkanError("Tekan Hitung dulu sebelum menyimpan");
             return;
         }
         JFileChooser chooser = new JFileChooser(new File("."));
-        chooser.setFileFilter(new FileNameExtensionFilter("File teks (*.txt)", "txt"));
         if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
@@ -268,6 +328,6 @@ public abstract class FeaturePage extends JPanel {
             path = path + ".txt";
         }
         OutputWriter.simpan(path, teksLengkap);
-        MessageDialog.tampilkan(this, "TERSIMPAN", "Hasil disimpan ke:\n" + path);
+        JOptionPane.showMessageDialog(this, "Hasil disimpan ke " + path);
     }
 }
