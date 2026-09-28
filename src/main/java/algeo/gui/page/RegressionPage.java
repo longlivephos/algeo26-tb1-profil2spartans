@@ -62,6 +62,11 @@ public class RegressionPage extends FeaturePage {
         double[] knotBaru = (matriksKnot == null) ? new double[0] : kolom(matriksKnot, 0);
         int derajat = 3 - pilihanDerajat.getSelectedIndex(); // urutan combo: 3, 2, 1
 
+        int minTitik = derajat + 1 + knotBaru.length;
+        if (dataTitik.getRows() < minTitik) {
+        throw new MatrixException("Jumlah titik minimal adalah " + minTitik + " (derajat + 1 + " + knotBaru.length + " knot).");
+        }
+
         RegressionOutput outputBaru = new SplineRegression().solve(dataTitik, knotBaru, derajat);
 
         titik = dataTitik;
