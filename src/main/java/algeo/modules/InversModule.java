@@ -42,8 +42,9 @@ public class InversModule implements Module {
         }
 
         String teksLengkap = OutputWriter.teksInvers(namaMetode, m, output.getSteps(), output.getResult());
-        System.out.println();
+        System.out.println("\n================ KESIMPULAN ================");
         System.out.println(teksLengkap);
+        System.out.println("============================================");
 
         tanyaSimpan(sc, teksLengkap);
     }
@@ -54,7 +55,7 @@ public class InversModule implements Module {
         String sumber = sc.nextLine().trim();
 
         if (sumber.equals("2")) {
-            System.out.print("Path file (inverse_xxx.txt): ");
+            System.out.print("Masukkan path file (contoh: test/inverse_1.txt): ");
             return MatrixReader.bacaFile(sc.nextLine().trim());
         }
 
@@ -85,14 +86,14 @@ public class InversModule implements Module {
     }
 
     private void tanyaSimpan(Scanner sc, String teks) {
-        System.out.print("Simpan hasil ke file .txt? (y/n): ");
+        System.out.print("\nSimpan hasil keseluruhan ini ke file .txt? (y/n): ");
         if (!sc.nextLine().trim().equalsIgnoreCase("y")) return;
 
-        System.out.print("Nama file output (tanpa .txt): ");
-        String path = sc.nextLine().trim() + ".txt";
+        System.out.print("Masukkan nama/path file tujuan (contoh: test/hasil_invers.txt): ");
+        String pathSimpan = sc.nextLine().trim();
         try {
-            OutputWriter.simpan(path, teks);
-            System.out.println("Berhasil disimpan ke " + path);
+            OutputWriter.simpan(pathSimpan, teks);
+            System.out.println("Hasil berhasil disimpan di: " + pathSimpan);
         } catch (IOException e) {
             System.out.println("Gagal menyimpan file: " + e.getMessage());
         }
