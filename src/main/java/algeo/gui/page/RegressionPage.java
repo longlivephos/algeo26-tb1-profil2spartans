@@ -1,5 +1,6 @@
 package algeo.gui.page;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -8,120 +9,134 @@ import algeo.core.matrix.Matrix;
 import algeo.core.matrix.MatrixException;
 import algeo.core.regression.RegressionOutput;
 import algeo.core.regression.SplineRegression;
+import algeo.core.util.DecimalParser;
 import algeo.core.util.NumberFormatter;
 import algeo.gui.component.MatrixInput;
-import algeo.gui.component.PixelButton;
 import algeo.gui.component.PlotPanel;
-import algeo.gui.theme.Theme;
-import algeo.gui.theme.ThemedUI;
 import algeo.io.OutputWriter;
 
-/**
- * Halaman regresi spline (truncated power basis) beserta prediksi dan grafik.
- */
 public class RegressionPage extends FeaturePage {
 
-    private final MatrixInput gridKnot = new MatrixInput(MatrixInput.Gaya.KNOT, 1, 1, 9, 1);
-    private final JComboBox<String> pilihanDerajat = new JComboBox<>(new String[] {
+    private JTextField fieldKnot = new JTextField(12);
+    private JComboBox<String> pilihanDerajat = new JComboBox<>(new String[] {
         "3 (kubik)",
         "2 (kuadratik)",
         "1 (linear)"
     });
-    private final JTextField fieldXt = new JTextField(7);
-    private final PlotPanel grafik = new PlotPanel();
+    private JTextField fieldXt = new JTextField(6);
+    private PlotPanel grafik = new PlotPanel();
 
-    // hasil HITUNG terakhir
     private Matrix titik;
     private double[] knot;
     private RegressionOutput output;
     private String namaMetode;
-    private StringBuilder hasilPrediksi = new StringBuilder();
+    private String hasilPrediksi = "";
 
     public RegressionPage() {
-        super("REGRESI SPLINE", "Isi titik sampel (x, y) maksimal 10 titik, lalu posisi knot (boleh 0 knot). " + "Jumlah titik minimal derajat + 1 + jumlah knot.", new MatrixInput(MatrixInput.Gaya.TITIK, 6, 2, 10, 2));
-        ThemedUI.gayakan(pilihanDerajat);
-        Theme.gayakan(fieldXt);
-        PixelButton tombolPrediksi = new PixelButton("PREDIKSI", Theme.BIRU, Theme.BIRU_TUA);
-        tombolPrediksi.addActionListener(e -> amanJalankan(this::prediksi));
-        fieldXt.addActionListener(e -> amanJalankan(this::prediksi));
-
-        tambahBarisOpsi(gridKnot);
-        JLabel catatan = new JLabel("<html><body style='width:300px'>Knot harus terurut naik dan berada " + "di antara x terkecil dan x terbesar.</body></html>");
-        catatan.setFont(Theme.BIASA);
-        catatan.setForeground(Theme.TEKS);
-        tambahBarisOpsi(catatan);
-        tambahBarisOpsi(Theme.label("Derajat:"), pilihanDerajat);
-        tambahBarisOpsi(Theme.label("xt ="), fieldXt, tombolPrediksi);
+        super(new MatrixInput("Jumlah titik:", 6, 10, new String[] {"x", "y"}));
+        JButton tombolPrediksi = new JButton("Prediksi");
+        tombolPrediksi.addActionListener(e -> {
+            try {
+                prediksi();
+            } catch (MatrixException ex) {
+                tampilkanError(ex.getMessage());
+            }
+        });
+        tambahOpsi(new JLabel("Posisi knot:"));
+        tambahOpsi(fieldKnot);
+        tambahOpsi(new JLabel("Derajat:"), pilihanDerajat);
+        tambahOpsi(new JLabel("xt ="), fieldXt, tombolPrediksi);
         tambahGrafik(grafik);
     }
 
     @Override
     protected void hitung() throws MatrixException {
-        Matrix dataTitik = grid.bacaMatriks();
-        Matrix matriksKnot = gridKnot.bacaMatriks();
-        double[] knotBaru = (matriksKnot == null) ? new double[0] : kolom(matriksKnot, 0);
-        int derajat = 3 - pilihanDerajat.getSelectedIndex(); // urutan combo: 3, 2, 1
-
-        int minTitik = derajat + 1 + knotBaru.length;
-        if (dataTitik.getRows() < minTitik) {
-        throw new MatrixException("Jumlah titik minimal adalah " + minTitik + " (derajat + 1 + " + knotBaru.length + " knot).");
-        }
+        Matrix dataTitik = input.bacaMatriks();
+        double[] knotBaru = bacaKnot();
+        int derajat = 3 - pilihanDerajat.getSelectedIndex();
 
         RegressionOutput outputBaru = new SplineRegression().solve(dataTitik, knotBaru, derajat);
 
         titik = dataTitik;
         knot = knotBaru;
         output = outputBaru;
-        namaMetode = (derajat == 3) ? "Regresi Spline Kubik" : "Regresi Spline Derajat " + derajat;
-        hasilPrediksi = new StringBuilder();
+        if (derajat == 3) {
+            namaMetode = "Regresi Spline Kubik";
+        } else {
+            namaMetode = "Regresi Spline Derajat " + derajat;
+        }
+        hasilPrediksi = "";
 
-        RegressionOutput hasil = output;
-        grafik.setData(kolom(titik, 0), kolom(titik, 1), t -> hasil.prediksi(t), knot);
-        tampilkanProses(output.getSteps(), susunTeks(), "KOEFISIEN DITEMUKAN", grafik::mulaiAnimasi);
+        double[] x = ambilKolom(titik, 0);
+        double[] y = ambilKolom(titik, 1);
+        double[] xKurva = buatSampelX(cariMin(x), cariMax(x));
+        double[] yKurva = new double[xKurva.length];
+        for (int i = 0; i < xKurva.length; i++) {
+            yKurva[i] = output.prediksi(xKurva[i]);
+        }
+        grafik.setData(x, y, xKurva, yKurva, knot);
+
+        mulaiTampilkan(output.getSteps(), susunTeks());
+    }
+
+    // contohnya seperti "2 4,5" menjadi {2, 4.5}
+    private double[] bacaKnot() throws MatrixException {
+        String isi = fieldKnot.getText().trim();
+        if (isi.isEmpty()) {
+            return new double[0];
+        }
+        String[] token = isi.split("\\s+");
+        double[] hasil = new double[token.length];
+        for (int i = 0; i < token.length; i++) {
+            try {
+                hasil[i] = DecimalParser.parse(token[i]);
+            } catch (NumberFormatException e) {
+                throw new MatrixException("Knot ke-" + (i + 1) + ": " + e.getMessage());
+            }
+        }
+        return hasil;
     }
 
     private void prediksi() throws MatrixException {
         if (output == null) {
-            throw new MatrixException("Tekan HITUNG dulu sebelum memprediksi.");
+            throw new MatrixException("Tekan Hitung dulu sebelum prediksi");
+        }
+        if (sedangJalan) {
+            throw new MatrixException("Tunggu sampai langkah selesai ditampilkan");
         }
         double xt = bacaAngka(fieldXt, "xt");
         double yt = output.prediksi(xt);
 
         String baris = "y^(" + NumberFormatter.teks(xt) + ") = " + NumberFormatter.teks(yt);
-        hasilPrediksi.append("- ").append(baris).append("\n");
-        pemutar.tambahCatatan("PREDIKSI", baris);
+        hasilPrediksi = hasilPrediksi + "- " + baris + "\n";
+        tambahKeOutput(baris);
         grafik.tambahTitikEvaluasi(xt, yt);
-        perbaruiTeksLengkap(susunTeks());
+        teksLengkap = susunTeks();
         fieldXt.setText("");
     }
 
     private String susunTeks() {
-        String posisiKnot;
+        String posisiKnot = "";
         if (knot.length == 0) {
             posisiKnot = "tanpa knot";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < knot.length; i++) {
-                if (i > 0) sb.append(", ");
-                sb.append(NumberFormatter.teks(knot[i]));
-            }
-            posisiKnot = sb.toString();
+        }
+        for (int i = 0; i < knot.length; i++) {
+            if (i > 0) posisiKnot = posisiKnot + ", ";
+            posisiKnot = posisiKnot + NumberFormatter.teks(knot[i]);
         }
 
-        // spesifikasi minta koefisien regresi ikut ditampilkan
-        StringBuilder persamaan = new StringBuilder(output.getPersamaan());
-        persamaan.append("\n\nKoefisien regresi:");
+        String persamaan = output.getPersamaan() + "\n\nKoefisien regresi:";
         double[] koef = output.getKoefisien();
         for (int i = 0; i < koef.length; i++) {
-            persamaan.append("\n  b").append(i).append(" = ").append(NumberFormatter.teks(koef[i]));
+            persamaan = persamaan + "\n  b" + i + " = " + NumberFormatter.teks(koef[i]);
         }
-        return OutputWriter.teksRegresiSpline(namaMetode, titik, output.getSteps(), posisiKnot, persamaan.toString(), hasilPrediksi.toString());
+        return OutputWriter.teksRegresiSpline(namaMetode, titik, output.getSteps(), posisiKnot, persamaan, hasilPrediksi);
     }
 
     @Override
     protected void reset() {
         super.reset();
-        gridKnot.kosongkan();
+        fieldKnot.setText("");
         output = null;
         grafik.kosongkan();
     }
