@@ -32,6 +32,9 @@ public class MatrixReader {
         if (isi == null) {
             throw new MatrixException("Teks matriks tidak boleh kosong");
         }
+        if (isi.startsWith("\uFEFF")) {
+            isi = isi.substring(1);
+        }
         String[] rawLines = isi.split("\r?\n", -1);
 
         int akhir = rawLines.length;
@@ -57,8 +60,8 @@ public class MatrixReader {
             String[] token = barisKe.trim().split("\\s+");
             if (kolomEkspektasi == -1) {
                 kolomEkspektasi = token.length;
-                if (kolomEkspektasi > MAKS_FILE) {
-                    throw new MatrixException("Jumlah kolom (" + kolomEkspektasi + ") melebihi batas maksimal " + MAKS_FILE);
+                if (kolomEkspektasi > MAKS_FILE + 1) { // +1 untuk kolom b pada augmented SPL
+                    throw new MatrixException("Jumlah kolom (" + kolomEkspektasi + ") melebihi batas maksimal " + (MAKS_FILE + 1));
                 }
             } else if (token.length != kolomEkspektasi) {
                 throw new MatrixException("Jumlah kolom pada baris ke-" + (i + 1) + " (" + token.length
