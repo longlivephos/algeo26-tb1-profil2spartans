@@ -94,7 +94,7 @@ public class OutputWriter {
                 StringBuilder sb = new StringBuilder();
                 double[] x = result.getSolution();
                 for (int i = 0; i < x.length; i++) {
-                    sb.append("x").append(i + 1).append(" = ").append(x[i]).append("\n");
+                    sb.append("x").append(i + 1).append(" = ").append(NumberFormatter.teks(x[i])).append("\n");
                 }
                 return sb.toString().trim();
             case NO_SOLUTION:
