@@ -22,6 +22,13 @@ public class DeterminanModule implements Module {
         System.out.println("2. Metode Ekspansi Kofaktor");
         System.out.print("Pilihan metode: ");
         String pilihan = sc.nextLine().trim();
+        
+        // validasi pilihan metode
+        if (!pilihan.equals("1") && !pilihan.equals("2")) {
+            System.out.println("Pilihan metode tidak valid. Harap pilih 1 atau 2.");
+            return;
+        }
+        
         String namaMetode = pilihan.equals("2") ? "Ekspansi Kofaktor" : "Reduksi Baris (OBE)";
 
         Matrix m;
@@ -37,7 +44,7 @@ public class DeterminanModule implements Module {
         try {
             det = pilihan.equals("2") ? Kofaktor.hitungKofaktor(m, steps) : OBE.hitungOBE(m, steps);
         } catch (MatrixException e) {
-            System.out.println("Matriks tidak memiliki determinan: " + e.getMessage());
+            System.out.println("Gagal menghitung determinan: " + e.getMessage());
             return;
         }
 
