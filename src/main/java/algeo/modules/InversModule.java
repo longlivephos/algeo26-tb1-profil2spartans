@@ -21,6 +21,13 @@ public class InversModule implements Module {
         System.out.println("2. Metode Adjoin (Kofaktor)");
         System.out.print("Pilihan metode: ");
         String pilihan = sc.nextLine().trim();
+        
+        // validasi pilihan program
+        if (!pilihan.equals("1") && !pilihan.equals("2")) {
+            System.out.println("Pilihan metode tidak valid. Harap pilih 1 atau 2.");
+            return;
+        }
+
         String namaMetode = pilihan.equals("2") ? "Metode Adjoin" : "Metode Augmentasi";
 
         Matrix m;
@@ -37,7 +44,7 @@ public class InversModule implements Module {
                     ? Adjoin.hitungInversAdjoin(m)
                     : Augmentasi.hitungInversAugmentasi(m);
         } catch (MatrixException e) {
-            System.out.println("Matriks tidak memiliki balikan: " + e.getMessage());
+            System.out.println("Gagal menghitung invers: " + e.getMessage());
             return;
         }
 
