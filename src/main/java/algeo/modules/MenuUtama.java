@@ -14,7 +14,7 @@ public class MenuUtama implements Module {
         Module interpolasiModule = new ModuleInterpolasi();
         Module splineModule = new ModuleSplineKubik();
         Module regresiSplineModule = new ModuleRegresiSplineKubik();
-
+        
         while (jalan) {
             System.out.println();
             System.out.println("*~* MENU UTAMA *~*");
@@ -26,6 +26,11 @@ public class MenuUtama implements Module {
             System.out.println("6. Regresi Spline Kubik");
             System.out.println("7. Keluar");
             System.out.print("Pilihan: ");
+
+            if(!sc.hasNextLine()) {
+                System.out.println("Input tidak valid. Program ditutup.");
+                sc.next(); 
+            }
 
             String pilihan = sc.nextLine().trim();
             try {
