@@ -20,6 +20,7 @@ public class SplineRegression {
      * @return koefisien regresi beserta langkah-langkahnya
      * @throws MatrixException jika input tidak valid atau X^T X tidak punya solusi tunggal
      */
+
     public RegressionOutput solve(Matrix titik, double[] knot) throws MatrixException {
         return solve(titik, knot, 3);
     }
