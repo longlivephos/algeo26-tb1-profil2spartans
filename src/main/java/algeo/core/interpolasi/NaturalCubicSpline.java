@@ -54,7 +54,7 @@ public class NaturalCubicSpline {
                     steps.add("Nilai x harus terurut naik");
                     return new InterpolasiSolverOutput(InterpolasiResult.failed("Data x tidak terurut naik"), steps);
                 }
-                steps.add(String.format(Locale.US, "h[%d] = %.4f", i, h[i]));
+                steps.add(String.format(Locale.US, "h[%d] = %.3f", i, h[i]));
             }
 
             //  menyederhanakan 4n variabel jadi 1 sistem persamaan tridiagonal
@@ -83,7 +83,7 @@ public class NaturalCubicSpline {
                 double rhs = 3.0 * ((y[i+1] - y[i])/h[i] - (y[i] - y[i-1])/h[i-1]);
                 aug.set(i, n+1, rhs);
 
-                steps.add(String.format(Locale.US, "Persamaan baris-%d: %.4f*c_%d + %.4f*c_%d + %.4f*c_%d = %.4f",
+                steps.add(String.format(Locale.US, "Persamaan baris-%d: %.3f*c_%d + %.3f*c_%d + %.3f*c_%d = %.3f",
                             (i + 1), h[i - 1], (i - 1), 2.0 * (h[i - 1] + h[i]), i, h[i], (i + 1), rhs));
             }
 
@@ -106,7 +106,7 @@ public class NaturalCubicSpline {
             steps.add("Nilai turunan kedua pada setiap knot: ");
             for (int i = 0; i <= n; i++) {
                 double turunanKedua = 2.0 * c[i];
-                steps.add(String.format(Locale.US, "  Knot x_%d (%.2f) -> S''(x) = 2 * c_%d = %.6f", i, x[i], i, turunanKedua));
+                steps.add(String.format(Locale.US, "  Knot x_%d (%.3f) -> S''(x) = 2 * c_%d = %.3f", i, x[i], i, turunanKedua));
             }
 
             // hitung koefisien a, b, d tiap segmen
@@ -123,11 +123,11 @@ public class NaturalCubicSpline {
                 koefisien[i][2] = c[i];
                 koefisien[i][3] = d;
 
-                steps.add(String.format(Locale.US, "Segmen %d [%.2f <= x <= %.2f]:", (i + 1), x[i], x[i + 1]));
-                steps.add(String.format(Locale.US, "  a_%d = %.6f", i, a));
-                steps.add(String.format(Locale.US, "  b_%d = %.6f", i, b));
-                steps.add(String.format(Locale.US, "  c_%d = %.6f", i, c[i]));
-                steps.add(String.format(Locale.US, "  d_%d = %.6f", i, d));
+                steps.add(String.format(Locale.US, "Segmen %d [%.3f <= x <= %.3f]:", (i + 1), x[i], x[i + 1]));
+                steps.add(String.format(Locale.US, "  a_%d = %.3f", i, a));
+                steps.add(String.format(Locale.US, "  b_%d = %.3f", i, b));
+                steps.add(String.format(Locale.US, "  c_%d = %.3f", i, c[i]));
+                steps.add(String.format(Locale.US, "  d_%d = %.3f", i, d));
                 steps.add("  " + bentukPersamaanSegmen(i, a, b, c[i], d, x[i]));
             }
 
@@ -189,7 +189,7 @@ public class NaturalCubicSpline {
 
         // suku a
         if (Math.abs(a) > 1e-9) {
-            sb.append(String.format(Locale.US, "%.4f", a));
+            sb.append(String.format(Locale.US, "%.3f", a));
             adaSukuSebelumnya = true;
         }
 
@@ -197,12 +197,12 @@ public class NaturalCubicSpline {
         if (Math.abs(b) > 1e-9) {
             if (adaSukuSebelumnya) {
                 if (b > 0) {
-                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)", b, xi));
+                    sb.append(String.format(Locale.US, " + %.3f*(x - %.3f)", b, xi));
                 } else {
-                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)", Math.abs(b), xi));
+                    sb.append(String.format(Locale.US, " - %.3f*(x - %.3f)", Math.abs(b), xi));
                 }
             } else {
-                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)", b, xi));
+                sb.append(String.format(Locale.US, "%.3f*(x - %.3f)", b, xi));
                 adaSukuSebelumnya = true;
             }
         }
@@ -211,12 +211,12 @@ public class NaturalCubicSpline {
         if (Math.abs(c) > 1e-9) {
             if (adaSukuSebelumnya) {
                 if (c > 0) {
-                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)^2", c, xi));
+                    sb.append(String.format(Locale.US, " + %.3f*(x - %.3f)^2", c, xi));
                 } else {
-                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)^2", Math.abs(c), xi));
+                    sb.append(String.format(Locale.US, " - %.3f*(x - %.3f)^2", Math.abs(c), xi));
                 }
             } else {
-                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)^2", c, xi));
+                sb.append(String.format(Locale.US, "%.3f*(x - %.3f)^2", c, xi));
                 adaSukuSebelumnya = true;
             }
         }
@@ -225,18 +225,18 @@ public class NaturalCubicSpline {
         if (Math.abs(d) > 1e-9) {
             if (adaSukuSebelumnya) {
                 if (d > 0) {
-                    sb.append(String.format(Locale.US, " + %.4f*(x - %.2f)^3", d, xi));
+                    sb.append(String.format(Locale.US, " + %.3f*(x - %.3f)^3", d, xi));
                 } else {
-                    sb.append(String.format(Locale.US, " - %.4f*(x - %.2f)^3", Math.abs(d), xi));
+                    sb.append(String.format(Locale.US, " - %.3f*(x - %.3f)^3", Math.abs(d), xi));
                 }
             } else {
-                sb.append(String.format(Locale.US, "%.4f*(x - %.2f)^3", d, xi));
+                sb.append(String.format(Locale.US, "%.3f*(x - %.3f)^3", d, xi));
                 adaSukuSebelumnya = true;
             }
         }
 
         if (!adaSukuSebelumnya) {
-            sb.append("0.0000");
+            sb.append("0.000");
         }
 
         return sb.toString();
