@@ -107,7 +107,8 @@ public class RegressionOutput {
                 sb.append(var).append("^").append(j);
             } else if (j > derajat) {
                 double k = knot[j - derajat - 1];
-                if (k < 0) sb.append("(x + ").append(teksAngka(-k)).append(")_+");
+                if (k == 0) sb.append("(x)_+");
+                else if (k < 0) sb.append("(x + ").append(teksAngka(-k)).append(")_+");
                 else sb.append("(x - ").append(teksAngka(k)).append(")_+");
                 if (derajat > 1) sb.append("^").append(derajat);
             }
@@ -115,6 +116,18 @@ public class RegressionOutput {
         }
         if (!adaSuku) sb.append(" 0");
         return sb.toString();
+    }
+
+    /**
+     * Keterangan arti notasi (x - k)_+ supaya persamaan mudah dibaca
+     * @return teks keterangan diawali baris baru, atau "" jika tidak ada knot
+     */
+    public String getKeteranganNotasi() {
+        if (knot.length == 0) return "";
+        if (derajat == 1) {
+            return "\ndengan (x - k)_+ = x - k jika x > k, dan 0 jika x <= k";
+        }
+        return "\ndengan (x - k)_+^" + derajat + " = (x - k)^" + derajat + " jika x > k, dan 0 jika x <= k";
     }
 
     static String teksAngka(double v) {
