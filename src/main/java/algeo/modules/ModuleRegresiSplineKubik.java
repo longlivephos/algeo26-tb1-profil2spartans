@@ -121,7 +121,7 @@ public class ModuleRegresiSplineKubik implements Module {
             RegressionOutput regOutput = solver.solve(inputData, knots, derajat); 
 
             String posisiKnotStr = (k == 0) ? "Tanpa Knot" : Arrays.toString(knots);
-            String persamaanStr = regOutput.getPersamaan();
+            String persamaanStr = regOutput.getPersamaan() + regOutput.getKeteranganNotasi();
 
             System.out.println("\n>> Regresi Spline berhasil dihitung!");
             System.out.println(">> Posisi Knot: " + posisiKnotStr);

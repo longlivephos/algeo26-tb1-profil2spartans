@@ -125,7 +125,7 @@ public class RegressionPage extends FeaturePage {
             posisiKnot = posisiKnot + NumberFormatter.teks(knot[i]);
         }
 
-        String persamaan = output.getPersamaan() + "\n\nKoefisien regresi:";
+        String persamaan = output.getPersamaan() + output.getKeteranganNotasi() + "\n\nKoefisien regresi:";
         double[] koef = output.getKoefisien();
         for (int i = 0; i < koef.length; i++) {
             persamaan = persamaan + "\n  b" + i + " = " + NumberFormatter.teks(koef[i]);
