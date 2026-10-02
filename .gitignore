@@ -1,4 +1,4 @@
-target/
+﻿target/
 *.class
 *.jar
 !bin/*.jar
@@ -6,3 +6,14 @@ target/
 .settings/
 .classpath
 .project
+
+docs/laporan/*.aux
+docs/laporan/*.log
+docs/laporan/*.xdv
+docs/laporan/*.toc
+docs/laporan/*.lof
+docs/laporan/*.lot
+docs/laporan/*.out
+docs/laporan/*.fls
+docs/laporan/*.fdb_latexmk
+docs/laporan/*.synctex.gz
