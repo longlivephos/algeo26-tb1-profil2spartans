@@ -3,13 +3,13 @@
 
 \subsection{Sistem Persamaan Linier}
 
-SPL dengan $m$ persamaan dan $n$ variabel dapat ditulis sebagai $Ax = b$, dengan $A$ merupakan matriks koefisien berukuran $m \times n$, $x$ vektor variabel, dan $b$ vektor konstanta. Dalam program, SPL disimpan sebagai matriks \textit{augmented} $[A\,|\,b]$ berukuran $m \times (n+1)$. Sebuah SPL bisa memiliki solusi tunggal, tak hingga banyak solusi, atau tidak memiliki solusi sama sekali.
+SPL dengan $m$ persamaan dan $n$ variabel dapat ditulis sebagai $Ax = b$. Matriks $A$ berukuran $m \times n$ berisi koefisien, $x$ adalah vektor variabel, dan $b$ adalah vektor konstanta di ruas kanan. Di dalam program, SPL kami simpan sebagai matriks \textit{augmented} $[A\,|\,b]$ berukuran $m \times (n+1)$ supaya keempat metode menerima bentuk masukan yang sama.
 
-Ketiga kemungkinan solusi tersebut dapat diketahui melalui rank \cite{anton}. Jika $\operatorname{rank}(A) < \operatorname{rank}([A\,|\,b])$ terdapat baris berbentuk $0 = c$ dengan $c \neq 0$ yang membuat SPL tidak konsisten. Jika kedua rank sama dan bernilai $n$ maka  solusinya tunggal. Jika kedua rank sama tetapi kurang dari $n$ maka terdapat $n - \operatorname{rank}(A)$ variabel bebas dan solusinya ditulis dalam bentuk parametrik.
+Solusi sebuah SPL hanya punya tiga kemungkinan, yaitu tunggal, banyaknya tak terhingga, atau tidak ada sama sekali. Kemungkinan mana yang terjadi dapat diketahui dari rank $A$ dan rank $[A\,|\,b]$ \cite{anton}. Jika $\operatorname{rank}(A) < \operatorname{rank}([A\,|\,b])$, hasil eliminasinya pasti memuat baris $0 = c$ dengan $c \neq 0$, artinya SPL tidak konsisten. Jika kedua rank sama dan bernilai $n$, solusinya tunggal. Jika kedua rank sama, tetapi lebih kecil dari $n$, terdapat $n - \operatorname{rank}(A)$ variabel bebas sehingga solusinya ditulis dalam bentuk parametrik.
 
 \subsubsection{Operasi Baris Elementer}
 
-Ketiga operasi baris elementer (OBE) adalawh sebagai berikut tanpa mengubah himpunan solusi SPL:
+Metode eliminasi pada subbab ini hanya memakai tiga jenis operasi baris elementer (OBE). Ketiganya tidak mengubah himpunan solusi SPL:
 \begin{enumerate}[nosep]
   \item menukar dua baris;
   \item mengalikan sebuah baris dengan konstanta tidak nol;
@@ -18,34 +18,35 @@ Ketiga operasi baris elementer (OBE) adalawh sebagai berikut tanpa mengubah himp
 
 \subsubsection{Eliminasi Gauss}
 
-Eliminasi Gauss memakai OBE untuk mengubah $[A\,|\,b]$ menjadi matriks eselon baris. Setiap baris tidak nol diawali angka 1 (satu utama) dan satu utama pada baris di bawahnya selalu terletak lebih ke kanan. Setelah bentuk eselon tercapai, selanjutnya nilai variabel dicari dari baris paling bawah ke atas dengan substitusi mundur:
+Eliminasi Gauss memakai OBE untuk mengubah $[A\,|\,b]$ menjadi matriks eselon baris. Pada matriks eselon baris, setiap baris yang tidak nol diawali angka 1 (disebut satu utama), dan satu utama pada baris di bawahnya selalu berada lebih ke kanan. Setelah bentuk ini tercapai, nilai variabel dihitung mulai dari baris paling bawah, lalu naik satu per satu ke atas. Proses ini disebut substitusi mundur:
 \[
 x_i = b'_i - \sum_{j=i+1}^{n} a'_{ij}\, x_j .
 \]
+Kolom yang tidak memiliki satu utama berpadanan dengan variabel bebas.
 
 \subsubsection{Eliminasi Gauss-Jordan}
 
-Gauss-Jordan melanjutkan eliminasi Gauss sampai matriks berbentuk eselon baris tereduksi dimana setiap kolom yang memuat satu utama bernilai nol di semua baris lain. Pada bentuk ini solusi dapat langsung dibaca dari kolom terakhir tanpa substitusi mundur.
+Gauss-Jordan sebenarnya merupakan lanjutan dari eliminasi Gauss. Selain menolkan elemen di bawah satu utama, metode ini juga menolkan elemen di atasnya sehingga matriks menjadi eselon baris tereduksi. Jika solusinya tunggal, kolom terakhir matriks tersebut langsung berisi nilai $x_1, \dots, x_n$ dan substitusi mundur tidak lagi diperlukan. Sebagai gantinya, jumlah OBE yang dilakukan lebih banyak daripada eliminasi Gauss.
 
 \subsubsection{\textit{Partial Pivoting}}
 
-Komputer menyimpan bilangan real sebagai \textit{floating point} dengan presisi terbatas (sekitar 16 digit desimal untuk tipe data \texttt{double}). Jika elemen pivot sangat kecil, faktor pengali $a_{ik}/a_{kk}$ menjadi sangat besar dan galat pembulatan ikut membesar. \textit{Partial pivoting} mencegah hal ini dengan memilih baris yang memiliki nilai mutlak terbesar pada kolom yang sedang diproses lalu menukarnya ke posisi pivot.
+Komputer menyimpan bilangan real dalam format \textit{floating point} yang presisinya terbatas, tipe \texttt{double} pada Java hanya teliti sampai sekitar 16 digit desimal. Jika pivot yang dipakai bernilai sangat kecil, faktor pengali $a_{ik}/a_{kk}$ menjadi sangat besar sehingga galat pembulatan yang awalnya kecil ikut membesar. \textit{Partial pivoting} mengatasi masalah ini dengan cara yang cukup sederhana. Sebelum kolom ke-$k$ dieliminasi, dicari baris (mulai dari baris ke-$k$ ke bawah) yang elemennya pada kolom tersebut memiliki nilai mutlak terbesar, lalu baris itu ditukar ke posisi pivot. Spesifikasi tugas mewajibkan cara ini untuk eliminasi Gauss dan Gauss-Jordan.
 
 \subsubsection{Metode Matriks Balikan}
 
-Jika $A$ merupakan matriks berukuran $m$ $x$ $m$ persegi dan memiliki balikan, kedua ruas $Ax = b$ dapat dikalikan dari kiri dengan $A^{-1}$ sehingga
+Jika $A$ persegi dan memiliki balikan, kedua ruas $Ax = b$ dapat dikalikan dengan $A^{-1}$ dari kiri sehingga
 \[
 x = A^{-1} b .
 \]
-Metode ini hanya berlaku untuk SPL dengan jumlah persamaan ($baris$) sama dengan jumlah variabel($kolom$) dan $\det(A) \neq 0$.
+Metode ini hanya berlaku untuk SPL yang jumlah persamaannya sama dengan jumlah variabelnya dan $\det(A) \neq 0$. Untuk SPL yang solusinya tidak tunggal, $A^{-1}$ tidak ada sehingga metode ini tidak dapat memberikan jawaban.
 
 \subsubsection{Kaidah Cramer}
 
-Untuk $A$ berukuran $n \times n$ dengan $\det(A) \neq 0$, solusi tunggal SPL adalah
+Kaidah Cramer memiliki syarat yang sama dengan metode matriks balikan, yaitu $A$ berukuran $n \times n$ dan $\det(A) \neq 0$. Solusinya adalah
 \[
 x_k = \frac{\det(A_k)}{\det(A)}, \qquad k = 1, 2, \dots, n,
 \]
-dengan $A_k$ adalah matriks $A$ yang kolom ke-$k$-nya diganti vektor $b$. Kaidah ini membutuhkan $n+1$ perhitungan determinan, sehingga jauh lebih lambat daripada eliminasi untuk $n$ besar.
+dengan $A_k$ adalah matriks $A$ yang kolom ke-$k$-nya diganti dengan vektor $b$. Rumusnya memang ringkas, tetapi untuk $n$ variabel diperlukan $n+1$ kali perhitungan determinan. Oleh karena itu, untuk $n$ yang besar, kaidah Cramer jauh lebih lambat daripada metode eliminasi.
 
 \subsection{Determinan Matriks}
 
@@ -139,28 +140,32 @@ d_j = \frac{c_{j+1} - c_j}{3h_j} .
 \]
 Karena $S_j''(x_j) = 2c_j$, turunan kedua pada knot ke-$j$ adalah $M_j = 2c_j$. Syarat batas natural $M_0 = M_n = 0$ setara dengan $c_0 = c_n = 0$.
 
-\subsection{Regresi Spline Kubik}
+\subsection{Regresi \textit{Spline} Kubik}
 
-Regresi spline tidak mengharuskan kurva melalui setiap titik. Kurva dicari sedemikian rupa sehingga jumlah kuadrat galatnya minimum. Kurva tersusun atas potongan polinomial yang tersambung pada knot $\xi_1 < \xi_2 < \dots < \xi_K$.
+Berbeda dengan interpolasi, regresi \textit{spline} tidak memaksa kurva melewati setiap titik data. Kurva dipilih sedemikian rupa sehingga jumlah kuadrat galatnya, yaitu $\sum_i \bigl(y_i - f(x_i)\bigr)^2$, sekecil mungkin. Kurva tersebut tersusun atas beberapa potongan polinomial yang bersambung pada simpul (\textit{knot}) $\xi_1 < \xi_2 < \dots < \xi_K$. Posisi setiap \textit{knot} ditentukan oleh pengguna.
 
 \subsubsection{\textit{Truncated Power Basis}}
 
-Spline berderajat $d$ dengan $K$ knot dapat dinyatakan sebagai kombinasi linier dari $M = d + 1 + K$ fungsi basis \cite{hastie}:
+\textit{Spline} kubik dengan $K$ \textit{knot} dapat dinyatakan sebagai kombinasi linier dari $M = 4 + K$ fungsi basis \cite{hastie}:
 \[
-f(x) = \sum_{j=0}^{d} \beta_j x^j + \sum_{k=1}^{K} \beta_{d+k}\, (x - \xi_k)_+^{d},
+f(x) = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \sum_{k=1}^{K} \beta_{3+k}\, (x - \xi_k)_+^{3},
 \qquad
 (u)_+ = \max(0, u) .
 \]
-Untuk spline kubik ($d = 3$), basisnya adalah $1, x, x^2, x^3$ ditambah $(x - \xi_k)_+^3$ untuk setiap knot, sehingga $M = 4 + K$. Fungsi $(x - \xi_k)_+^3$ bernilai nol di kiri knot dan turunan pertama serta keduanya kontinu di $\xi_k$ sehingga $f$ otomatis kontinu hingga turunan kedua tanpa persamaan tambahan. Untuk $d = 1$, basis $(x - \xi_k)_+$ menghasilkan garis patah yang tersambung di setiap knot.
+Empat basis pertama hanyalah polinomial kubik biasa. Setiap \textit{knot} menambahkan satu basis $(x - \xi_k)_+^3$ yang bernilai nol di sebelah kiri $\xi_k$ dan baru berpengaruh di sebelah kanannya. Nilai basis ini, turunan pertamanya, dan turunan keduanya sama-sama nol tepat di $\xi_k$ sehingga kurva otomatis tersambung mulus sampai turunan kedua. Karena itu, kami tidak perlu menambahkan persamaan kontinuitas seperti pada \textit{natural cubic spline}, yang berubah di $\xi_k$ hanya turunan ketiganya.
+
+Program kami juga menerima derajat 1 dan 2. Untuk derajat $d$, basisnya menjadi $1, x, \dots, x^d$ ditambah $(x - \xi_k)_+^d$ untuk setiap \textit{knot} sehingga $M = d + 1 + K$. Derajat 3 tetap menjadi pilihan bawaan sesuai dengan spesifikasi.
 
 \subsubsection{Matriks Desain dan Persamaan Normal}
 
-Untuk $N$ titik data, setiap baris matriks desain $X \in \mathbb{R}^{N \times M}$ berisi nilai semua fungsi basis di $x_i$ dan model ditulis $y = X\beta + \epsilon$. Jika $N > M$, SPL $X\beta = y$ umumnya tidak konsisten. Solusi kuadrat terkecil $\hat\beta$ adalah vektor yang membuat $X\hat\beta$ menjadi proyeksi ortogonal $y$ ke ruang kolom $X$. Syaratnya, vektor sisa tegak lurus terhadap semua kolom $X$:
+Untuk $N$ titik data, setiap titik menghasilkan satu persamaan $y_i = f(x_i) + \epsilon_i$. Jika semua persamaan itu disusun, diperoleh $y = X\beta + \epsilon$, dengan $X$ adalah matriks desain berukuran $N \times M$. Baris ke-$i$ matriks ini berisi nilai setiap fungsi basis di $x_i$.
+
+Karena $N > M$, SPL $X\beta = y$ umumnya tidak memiliki solusi: jumlah persamaannya lebih banyak daripada koefisien yang bisa diatur. Yang dicari kemudian adalah $\hat\beta$ yang membuat $X\hat\beta$ sedekat mungkin dengan $y$. Vektor terdekat tersebut adalah proyeksi ortogonal $y$ ke ruang kolom $X$ sehingga vektor sisa $y - X\hat\beta$ harus tegak lurus terhadap setiap kolom $X$:
 \[
 X^T(y - X\hat\beta) = 0
 \quad\Longrightarrow\quad
 (X^TX)\hat\beta = X^Ty .
 \]
-Persamaan terakhir disebut persamaan normal. Jika kolom-kolom $X$ bebas linier, $X^TX$ simetris definit positif dan $\hat\beta$ tunggal. Syarat ini gagal jika jumlah titik kurang dari $M$ atau jika ada selang antar-knot yang tidak berisi cukup titik data tersebut.
+Persamaan terakhir disebut persamaan normal. Bentuknya berupa SPL persegi berukuran $M \times M$ sehingga dapat langsung diselesaikan dengan eliminasi Gauss yang sudah kami buat untuk fitur SPL. Solusinya tunggal jika kolom-kolom $X$ bebas linier. Syarat ini tidak terpenuhi jika jumlah titik lebih sedikit daripada $M$ atau jika ada selang antar-\textit{knot} yang tidak berisi cukup titik data.
 
-Persamaan normal memiliki bilangan kondisi kira-kira kuadrat dari bilangan kondisi $X$. Kolom $x^3$ yang bernilai besar di samping kolom $1$ yang bernilai kecil membuat $X^TX$ mudah menjadi \textit{ill-conditioned}. Salah satu cara umum menanganinya adalah menskalakan $x$ ke rentang $[-1, 1]$ sebelum membentuk $X$.
+Ada satu masalah numerik yang perlu diperhatikan. Untuk $x$ sekitar 100, kolom $x^3$ pada $X$ bernilai sekitar $10^6$, sedangkan kolom konstanta hanya bernilai 1. Perkalian $X^TX$ memperparah perbedaan skala ini sehingga eliminasi pada persamaan normal mudah terpengaruh galat pembulatan. Cara yang umum dipakai adalah menskalakan $x$ ke rentang $[-1, 1]$ sebelum $X$ dibentuk.
