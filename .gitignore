@@ -1,7 +1,7 @@
-﻿target/
-bin/
+target/
 *.class
 *.jar
+!bin/*.jar
 .vscode/
 .settings/
 .classpath
