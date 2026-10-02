@@ -61,23 +61,25 @@ OBE: $\det(A) = 0$ \qquad Kofaktor: $\det(A) = 0$
     \end{minipage}
 \end{center}
 \end{kasus}
-
 \subsubsection{Kasus Uji 3}
+
 \begin{kasus}
 \ubag{Input}
 \[
 \begin{bmatrix}
-3 & 1 & 0 & 1/2 & 3/5 \\
--1 & 0 & 1/4 & 1/5 & 9/20 \\
-5 & 4 & 1/2 & 1/2 & 1 \\
-3 & 5 & -1 & 2 & 3 \\
-1 & 2 & 3 & 4 & 5
+1/2 & 1 & 0 & 1/2 \\
+1/2 & 5/4 & 1/4 & 1/2 \\
+-1/10 & -2/5 & 1/5 & -3/10 \\
+3/5 & 5/4 & 9/20 & 3/5
 \end{bmatrix}
 \]
-Program tidak menerima pecahan, sehingga berkas masukan ditulis dalam desimal ($0.5$, $0.6$, $0.25$, $0.2$, $0.45$).
+Program tidak menerima pecahan, sehingga berkas masukan
+(\texttt{det\_5\_1\_3.txt}) ditulis dalam desimal ($0.5$, $1.25$, $0.25$,
+$-0.1$, $-0.4$, $0.2$, $-0.3$, $0.6$, $0.45$).
 \ubag{Output}
-\begin{center} 
-OBE: $\det(A) = 14.852$ \qquad Kofaktor: $\det(A) = 14.853$ \qquad Eksak: $5941/400 = 14.8525$
+\begin{center}
+OBE: $\det(A) = 0.01$ \qquad Kofaktor: $\det(A) = 0.01$ \qquad
+Eksak: $1/100 = 0.01$
 \end{center}
 \begin{center}
     \begin{minipage}{0.48\textwidth}
@@ -91,9 +93,8 @@ OBE: $\det(A) = 14.852$ \qquad Kofaktor: $\det(A) = 14.853$ \qquad Eksak: $5941/
 \end{center}
 \end{kasus}
 
-\textbf{Analisis.} Kasus 1 dan 2 menghasilkan nilai yang sama persis untuk kedua metode. Pada kasus 2, reduksi baris menemukan pivot yang nilainya di bawah toleransi, lalu langsung melaporkan determinan nol. Hasil ini benar karena perhitungan eksak juga memberi $\det(A) = 0$.
-
-Kasus 3 lebih menarik karena kedua metode menampilkan angka yang berbeda di digit ketiga. Nilai eksaknya $14.8525$, tepat berada di tengah antara $14.852$ dan $14.853$. Sebelum dibulatkan, OBE menghasilkan $14.852499999999985$ dan kofaktor menghasilkan $14.852500000000001$. Selisih sekecil $10^{-14}$ ini berasal dari urutan operasi \textit{floating point} yang berbeda: OBE melakukan pembagian untuk mencari faktor pengali, sedangkan kofaktor hanya menjumlahkan hasil kali. Angka seperti $0.45$ dan $0.6$ juga tidak dapat disimpan persis dalam biner. Karena nilai eksaknya tepat di batas pembulatan, galat sekecil apa pun menentukan arah pembulatan. Kedua jawaban sama-sama benar sampai presisi mesin sehingga perbedaannya hanya muncul pada pembulatan tampilan ke 3 desimal.
+\textbf{Analisis.} Kasus 1, 2, dan 3 semuanya menghasilkan nilai yang sama persis untuk kedua metode. Berdasarkan pengujian matriks 5x5, kedua metode sama-sama menghasilkan determinan 0 lalu algoritma Kofaktor bekerja  dengan menjadikan Baris 1 sebagai acuan untuk meng-skip minor bernilai nol sementara OBE mendeteksi elemen pivot nol di langkah ke-14 yang otomatis membuat perkalian diagonal utamanya mutlak bernilai 0.
+ Keakuratan serupa juga terbukti pada matriks desimal pecahan 4x4 yang menghasilkan determinan 0.01. Kofaktor  mengoptimasi komputasi dengan memotong perhitungan pada elemen nol di Baris 1 sedangkan OBE berhasil mereduksi matriks menjadi segitiga atas dengan penyesuaian tanda kali -1 akibat operasi tukar baris sehingga hasil kali seluruh elemen diagonal utamanya secara konsisten berujung pada nilai 0.01 yang identik.
 
 \subsection{Invers Matriks}
 
@@ -653,9 +654,7 @@ Komponen mencapai $65^\circ$C pada $t \approx 9.14$ menit.
 \end{center}
 \end{kasus}
 
-\textbf{Analisis.} Jika dibulatkan ke 3 desimal sesuai aturan tampilan, koefisien $t^4$ menjadi $-0.002$ dan koefisien $t^5$ menjadi $0$. Pembulatan ini hanya berlaku pada tampilan dimana evaluasi $T(t)$ tetap memakai koefisien penuh, karena membuang suku $t^5$ di $t = 10$ akan mengubah hasil sekitar $7.8^\circ$C.
-
-Untuk mencari waktu kerusakan, kami mengevaluasi $T(t)$ berulang kali. $T(9.1) = 64.783$ dan $T(9.2) = 65.425$, jadi titik $65^\circ$C berada di antara keduanya. Evaluasi lanjutan memberi $T(9.13) = 64.975$ dan $T(9.14) = 65.039$, dengan mempersempit selang terus-menerus (metode bagi dua) diperoleh $t \approx 9.134$ menit. Turunan $T'(t)$ positif di seluruh $[0, 10]$ dengan nilai terkecil sekitar $2.89$ di $t = 0$, jadi suhu naik terus dan hanya ada satu waktu yang memenuhi. Nilai ini tetap perkiraan dari model, karena interpolasi hanya menjamin ketepatan di titik data.
+\textbf{Analisis.} Berdasarkan pengujian, program berhasil memproses enam titik data awal yang menghasilkan persamaan polinomial $P(x) = 25 + 2.893x + 0.07x^2 + 0.02x^3 - 0.002x^4$. Persamaan  tersebut digunakan  untuk memprediksi peningkatan suhu secara maju menghasilkan taksiran berurutan sebesar $27.981^\circ\text{C}$ pada menit ke-1, $36.617^\circ\text{C}$ pada menit ke-3.5, $52.571^\circ\text{C}$ pada menit ke-7, dan $65.425^\circ\text{C}$ pada menit ke-9.2. Sementara itu, untuk memecahkan persoalan waktu kerusakan komponen pada suhu spesifik $65^\circ\text{C}$  program  menukar variabel suhu menjadi sumbu $x$ dan waktu menjadi sumbu $y$. Melalui pendekatan tersebut, terbentuk persamaan balikan baru $P(x) = -12.719 + 0.702x - 0.009x^2$ yang saat dievaluasi pada target $P(65)$ menunjukkan bahwa komponen akan rusak pada menit ke-9.14.
 
 \subsection{Studi Kasus Interpolasi \textit{Natural Cubic Spline}}
 
