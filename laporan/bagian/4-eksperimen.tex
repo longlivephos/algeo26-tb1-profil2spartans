@@ -1,0 +1,510 @@
+\clearpage
+\section{Eksperimen}
+
+Bagian ini berisi hasil eksekusi program terhadap seluruh kasus uji pada Bab 5 spesifikasi. Berkas masukannya tersimpan di folder \texttt{test/} dengan pola nama \texttt{spl\_*.txt}, \texttt{det\_*.txt}, \texttt{inverse\_*.txt}, \texttt{interpolasi\_*.txt}, dan \texttt{regresi\_*.txt}. Angka pada bagian \textit{Output} adalah keluaran pustaka kelompok yang sudah dibulatkan ke 3 angka di belakang koma, sama seperti yang ditampilkan program. Sebagai pembanding, kami menghitung solusi eksak dengan aritmetika pecahan (\textit{rational}) di SymPy.
+
+\isi{Ganti setiap kotak merah dengan tangkapan layar keluaran CLI atau GUI untuk kasus tersebut. Angkanya harus sama dengan yang tertulis di kotak Output.}
+
+\subsection{Determinan Matriks}
+
+Setiap kasus diuji dengan metode reduksi baris (OBE) dan ekspansi kofaktor.
+
+\subsubsection{Kasus Uji 1}
+\begin{kasus}
+\ubag{Input}
+\[
+\begin{bmatrix}
+0 & 2 & -1 & 3 \\
+4 & 1 & 2 & -2 \\
+-2 & 3 & 0 & 1 \\
+1 & -1 & 5 & 2
+\end{bmatrix}
+\]
+\ubag{Output}
+\begin{center}
+OBE: $\det(A) = -259$ \qquad Kofaktor: $\det(A) = -259$
+\end{center}
+\begin{center}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{det_1_obe}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{det_1_kof}
+    \end{minipage}
+\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 2}
+\begin{kasus}
+\ubag{Input}
+\[
+\begin{bmatrix}
+2 & -1 & 3 & 0 & 4 \\
+1 & 2 & -2 & 5 & -1 \\
+3 & 1 & 1 & 2 & 0 \\
+4 & -1 & 3 & 2 & 0 \\
+5 & 0 & 4 & 2 & 4
+\end{bmatrix}
+\]
+\ubag{Output}
+\begin{center}
+OBE: $\det(A) = 0$ \qquad Kofaktor: $\det(A) = 0$
+\end{center}
+\begin{center}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{det_2_obe}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{det_2_kof}
+    \end{minipage}
+\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 3}
+\begin{kasus}
+\ubag{Input}
+\[
+\begin{bmatrix}
+3 & 1 & 0 & 1/2 & 3/5 \\
+-1 & 0 & 1/4 & 1/5 & 9/20 \\
+5 & 4 & 1/2 & 1/2 & 1 \\
+3 & 5 & -1 & 2 & 3 \\
+1 & 2 & 3 & 4 & 5
+\end{bmatrix}
+\]
+Program tidak menerima pecahan, sehingga berkas masukan ditulis dalam desimal ($0.5$, $0.6$, $0.25$, $0.2$, $0.45$).
+\ubag{Output}
+\begin{center} 
+OBE: $\det(A) = 14.852$ \qquad Kofaktor: $\det(A) = 14.853$ \qquad Eksak: $5941/400 = 14.8525$
+\end{center}
+\begin{center}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{det_3_obe}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{det_3_kof}
+    \end{minipage}
+\end{center}
+\end{kasus}
+
+\textbf{Analisis.} Kasus 1 dan 2 menghasilkan nilai yang sama persis untuk kedua metode. Pada kasus 2, reduksi baris menemukan pivot yang nilainya di bawah toleransi, lalu langsung melaporkan determinan nol. Hasil ini benar karena perhitungan eksak juga memberi $\det(A) = 0$.
+
+Kasus 3 lebih menarik karena kedua metode menampilkan angka yang berbeda di digit ketiga. Nilai eksaknya $14.8525$, tepat berada di tengah antara $14.852$ dan $14.853$. Sebelum dibulatkan, OBE menghasilkan $14.852499999999985$ dan kofaktor menghasilkan $14.852500000000001$. Selisih sekecil $10^{-14}$ ini berasal dari urutan operasi \textit{floating point} yang berbeda: OBE melakukan pembagian untuk mencari faktor pengali, sedangkan kofaktor hanya menjumlahkan hasil kali. Angka seperti $0.45$ dan $0.6$ juga tidak dapat disimpan persis dalam biner. Karena nilai eksaknya tepat di batas pembulatan, galat sekecil apa pun menentukan arah pembulatan. Kedua jawaban sama-sama benar sampai presisi mesin; perbedaannya hanya muncul pada pembulatan tampilan ke 3 desimal.
+
+\subsection{Invers Matriks}
+
+Setiap kasus diuji dengan metode augmentasi dan metode adjoin.
+
+\subsubsection{Kasus Uji 1}
+\begin{kasus}
+\ubag{Input}
+\[
+\begin{bmatrix}
+0 & 1 & 2 & -1 \\
+1 & 0 & 1 & 2 \\
+2 & 1 & 0 & 1 \\
+-1 & 2 & 1 & 0
+\end{bmatrix}
+\]
+\ubag{Output}
+Augmentasi dan adjoin menghasilkan matriks yang sama:
+\[
+A^{-1} = \begin{bmatrix}
+0.2 & -0.1 & 0.4 & -0.3 \\
+-0.1 & -0.2 & 0.3 & 0.4 \\
+0.4 & 0.3 & -0.2 & -0.1 \\
+-0.3 & 0.4 & -0.1 & 0.2
+\end{bmatrix}
+\]
+\textbf{Augmentasi}
+\tangkapan{hasil_inverse_1_aug_1}
+\tangkapan{hasil_inverse_1_aug_2}
+\tangkapan{hasil_inverse_1_aug_3}
+\tangkapan{hasil_inverse_1_aug_4}
+
+\textbf{Kofaktor}
+\tangkapan{hasil_inverse_1_kof_1}
+\tangkapan{hasil_inverse_1_kof_2}
+\tangkapan{hasil_inverse_1_kof_3}
+\end{kasus}
+
+\subsubsection{Kasus Uji 2}
+\begin{kasus}
+\ubag{Input}
+\[
+\begin{bmatrix}
+1 & 2 & 0 & -1 & 3 \\
+2 & -1 & 4 & 0 & 1 \\
+0 & 3 & 1 & 2 & -2 \\
+4 & 0 & 5 & 1 & 2 \\
+3 & 1 & 4 & -1 & 4
+\end{bmatrix}
+\]
+\ubag{Output}
+Kedua metode: \texttt{matriks tidak memiliki balikan (Matriks singular, determinan = 0)}.
+
+\textbf{Augmentasi}
+\tangkapan{inverse_2_aug_1}
+\tangkapan{inverse_2_aug_2}
+\tangkapan{inverse_2_aug_3}
+\tangkapan{inverse_2_aug_4}
+\tangkapan{inverse_2_aug_5}
+\tangkapan{inverse_2_aug_6}
+
+\textbf{Kofaktor}
+\tangkapan{inverse_2_kof_1}
+\end{kasus}
+
+\textbf{Analisis.} Pada kasus 1, kedua metode menghasilkan invers matriks yang sama. Hasil tersebut juga sesuai dengan nilai yang ditulis dalam bentuk nilai sebenarnya (tanpa pembulatan desimal), yaitu matriks dengan elemen-elemen yang merupakan kelipatan $1/10$. Selain itu, karena matriks $A$ simetris, maka matriks balikannya pun juga simetris.
+
+Sementara, di kasus 2, matriks tidak memiliki invers matriks karena baris kelima merupakan hasil penjumlahan baris pertama dan baris kedua. Karena itu, baris-baris matriks tidak bebas secara linier dan $\det(A) = 0$. Pada metode augmentasi, kondisi ini baru terlihat ketika tidak ditemukan pivot yang dapat digunakan pada salah satu kolom. Sementara itu, metode adjoin terlebih dahulu memeriksa determinan. Karena determinannya nol, jadi proses mencari balikan dihentikan.
+
+\subsection{Sistem Persamaan Linier $Ax = b$}
+
+Setiap kasus dijalankan dengan keempat metode. Metode matriks balikan dan kaidah Cramer hanya bisa dipakai jika $A$ persegi dan $\det(A) \neq 0$; jika syarat itu tidak terpenuhi, program menampilkan pesan alasannya.
+
+\subsubsection{Kasus Uji 1}
+\begin{kasus}
+\ubag{Input}
+\[
+A = \begin{bmatrix}
+0 & 2 & -1 & 1 \\
+1 & -1 & 2 & 3 \\
+2 & 1 & 1 & -1 \\
+-1 & 3 & 0 & 2
+\end{bmatrix}, \quad
+b = \begin{bmatrix} -5 \\ 15 \\ 1 \\ -3 \end{bmatrix}
+\]
+\ubag{Output}
+\begin{center}
+Gauss, Gauss-Jordan, Balikan, Cramer: $x_1 = 1$, $x_2 = -2$, $x_3 = 3$, $x_4 = 2$
+\end{center}
+\begin{center}\gambarkosong{Tangkapan layar SPL kasus 1}{3cm}\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 2}
+\begin{kasus}
+\ubag{Input}
+\[
+A = \begin{bmatrix}
+1 & 2 & -1 & 0 & 3 \\
+2 & 4 & 1 & -1 & 5 \\
+-1 & -2 & 2 & 3 & -1
+\end{bmatrix}, \quad
+b = \begin{bmatrix} 2 \\ 10 \\ -1 \end{bmatrix}
+\]
+\ubag{Output}
+Gauss dan Gauss-Jordan (tak hingga solusi):
+\begin{align*}
+x_1 &= 3.9 - 2t_1 - 2.9t_2, & x_2 &= t_1, & x_3 &= 1.9 + 0.1t_2, \\
+x_4 &= -0.3 - 0.7t_2, & x_5 &= t_2 .
+\end{align*}
+Balikan dan Cramer: \texttt{tidak bisa dipakai karena jumlah persamaan tidak sama dengan jumlah variabel}.
+\begin{center}\gambarkosong{Tangkapan layar SPL kasus 2}{3cm}\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 3}
+\begin{kasus}
+\ubag{Input}
+\[
+A = \begin{bmatrix}
+1 & -2 & 3 & 1 \\
+2 & 1 & -1 & 4 \\
+0 & 3 & 2 & -2 \\
+3 & -1 & 2 & 5
+\end{bmatrix}, \quad
+b = \begin{bmatrix} 4 \\ -1 \\ 3 \\ 4 \end{bmatrix}
+\]
+\ubag{Output}
+Gauss dan Gauss-Jordan: \texttt{solusi tidak ada}.\\
+Balikan dan Cramer: \texttt{tidak bisa dipakai karena det(A) = 0}.
+\begin{center}\gambarkosong{Tangkapan layar SPL kasus 3}{3cm}\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 4: Matriks \textit{Discrete Laplacian}}
+\begin{kasus}
+\ubag{Input}
+$A_n$ bernilai 2 pada diagonal, $-1$ tepat di atas dan di bawah diagonal, dan 0 di tempat lain; $b$ berisi angka 1. Diuji untuk $n = 6$ dan $n = 10$.
+\ubag{Output}
+\begin{center}
+\begin{tabular}{lcccccccccc}
+\toprule
+$n$ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $x_9$ & $x_{10}$ \\
+\midrule
+6  & 3 & 5 & 6 & 6 & 5 & 3 & & & & \\
+10 & 5 & 9 & 12 & 14 & 15 & 15 & 14 & 12 & 9 & 5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Keempat metode memberi hasil yang sama setelah pembulatan.
+\begin{center}\gambarkosong{Tangkapan layar SPL kasus 4, n = 10}{3cm}\end{center}
+\end{kasus}
+
+\textbf{Analisis.} Pada kasus 1, keempat metode memberi jawaban yang sama dengan solusi eksak. Sebelum dibulatkan, nilainya berbeda sangat sedikit, misalnya $x_1$ bernilai $1.0000000000000002$ pada eliminasi Gauss dan $1.0000000000000004$ pada Gauss-Jordan. Perbedaan di digit ke-16 ini hilang setelah pembulatan.
+
+Kasus 2 memiliki 3 persamaan dan 5 variabel, sehingga paling sedikit ada 2 variabel bebas. Program memilih $x_2$ dan $x_5$ sebagai parameter karena kolom keduanya tidak memiliki pivot. Hasil SymPy memberi bentuk yang sama: $x_1 = 39/10 - 2x_2 - 29x_5/10$, $x_3 = 19/10 + x_5/10$, dan $x_4 = -3/10 - 7x_5/10$.
+
+Pada kasus 3, $\operatorname{rank}(A) = 3$ sedangkan $\operatorname{rank}([A\,|\,b]) = 4$, sehingga setelah eliminasi muncul baris $0 = c$ dengan $c \neq 0$. Metode balikan dan Cramer tidak dapat membedakan ``tidak ada solusi'' dan ``tak hingga solusi'' karena keduanya berhenti begitu $\det(A) = 0$. Untuk kasus seperti ini, hanya eliminasi Gauss dan Gauss-Jordan yang memberi jawaban lengkap.
+
+Kasus 4 dipakai untuk melihat kestabilan numerik. Solusi eksaknya $x_i = i(n+1-i)/2$, dan hasil keempat metode cocok dengan rumus itu. Matriks Laplacian dominan diagonal, sehingga \textit{partial pivoting} tidak perlu menukar baris dan galat tetap kecil. Galat terbesar sebelum pembulatan muncul pada kaidah Cramer untuk $n = 10$, misalnya $x_2 = 9.000000000000004$. Cramer menghitung 11 determinan secara terpisah dan setiap determinan membawa galat pembulatannya sendiri.
+
+\subsection{SPL Berbentuk Matriks \textit{Augmented}}
+
+\subsubsection{Kasus Uji 1}
+\begin{kasus}
+\ubag{Input}
+\[
+\left[\begin{array}{cccc|c}
+0 & 1 & -1 & 2 & -1 \\
+2 & 0 & 1 & -1 & 3 \\
+-1 & 2 & 0 & 1 & -3 \\
+1 & -1 & 2 & 0 & 9
+\end{array}\right]
+\]
+\ubag{Output}
+\begin{center}
+Keempat metode: $x_1 = 1$, $x_2 = -2$, $x_3 = 3$, $x_4 = 2$
+\end{center}
+\begin{center}\gambarkosong{Tangkapan layar SPL augmented kasus 1}{3cm}\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 2}
+\begin{kasus}
+\ubag{Input}
+\[
+\left[\begin{array}{cccccc|c}
+1 & 0 & 2 & -1 & 0 & 3 & -7 \\
+0 & 1 & -1 & 2 & 1 & 0 & 6 \\
+2 & -1 & 0 & 1 & 3 & -2 & 13 \\
+1 & 1 & 1 & 1 & 1 & 1 & 3
+\end{array}\right]
+\]
+\ubag{Output}
+Gauss dan Gauss-Jordan (tak hingga solusi):
+\begin{align*}
+x_1 &= 5.8 - t_1 - 1.6t_2, & x_2 &= 2.6 - t_1 - 0.2t_2, & x_3 &= -3.4 + t_1 + 0.8t_2, \\
+x_4 &= t_1, & x_5 &= t_2, & x_6 &= -2 .
+\end{align*}
+Balikan dan Cramer: tidak dapat dipakai karena matriks koefisien berukuran $4 \times 6$.
+\begin{center}\gambarkosong{Tangkapan layar SPL augmented kasus 2}{3cm}\end{center}
+\end{kasus}
+
+\textbf{Analisis.} Kasus 1 memiliki $a_{11} = 0$. Tanpa pertukaran baris, eliminasi akan membagi dengan nol pada langkah pertama. \textit{Partial pivoting} menukar baris 1 dengan baris 2 karena nilai mutlak terbesar di kolom pertama adalah 2, lalu eliminasi berjalan normal. Pada kasus 2, $x_6$ bernilai tetap $-2$ meskipun ada dua variabel bebas; himpunan solusinya berdimensi dua dan seluruhnya terletak pada $x_6 = -2$. Hasil ini cocok dengan perhitungan eksak.
+
+\subsection{SPL Berbentuk Umum}
+
+\subsubsection{Kasus Uji 1}
+\begin{kasus}
+\ubag{Input}
+\[
+\begin{cases}
+3x_1 + 2x_2 - x_3 + 4x_4 = 5 \\
+x_1 - 3x_2 + 2x_3 + x_4 = -2 \\
+4x_1 + x_2 + 5x_3 - 2x_4 = 7 \\
+2x_1 - x_2 + 3x_3 + x_4 = 3
+\end{cases}
+\]
+\ubag{Output}
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ \\
+\midrule
+Program (4 metode) & $-0.114$ & $1.841$ & $1.432$ & $0.773$ \\
+Nilai eksak & $-5/44$ & $81/44$ & $63/44$ & $17/22$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{center}\gambarkosong{Tangkapan layar SPL umum kasus 1}{3cm}\end{center}
+\end{kasus}
+
+\subsubsection{Kasus Uji 2}
+\begin{kasus}
+\ubag{Input}
+Sistem 9 persamaan dan 9 variabel pada spesifikasi 5.5.2, ditulis sebagai matriks \textit{augmented} $9 \times 10$ dengan mengelompokkan koefisien setiap variabel. Contohnya, persamaan keempat menjadi $0.03521x_1 + 0.68x_2 + 0.03521x_4 + 0.68x_6 + 0.03521x_7 + 0.55432x_9 = 8.47$.
+\ubag{Output}
+Gauss dan Gauss-Jordan (tak hingga solusi, satu parameter):
+\begin{align*}
+x_1 &= 5.776 - 0.462t, & x_2 &= 4.464 - 0.387t, & x_3 &= -0.24 + 0.849t, \\
+x_4 &= -0.736 + 0.971t, & x_5 &= 5.224 - 0.538t, & x_6 &= 7.512 - 0.433t, \\
+x_7 &= 4.227 - 0.416t, & x_8 &= 4.773 - 0.584t, & x_9 &= t .
+\end{align*}
+Balikan dan Cramer: \texttt{tidak bisa dipakai karena det(A) = 0}.
+\begin{center}\gambarkosong{Tangkapan layar SPL umum kasus 2}{3cm}\end{center}
+\end{kasus}
+
+\textbf{Analisis.} Kasus 1 memiliki solusi tunggal dan keempat metode sepakat. Kasus 2 terlihat seperti sistem persegi biasa, tetapi perhitungan eksak dengan pecahan menunjukkan $\operatorname{rank}(A) = \operatorname{rank}([A\,|\,b]) = 8$ dan $\det(A) = 0$ tepat, jadi jawaban tak hingga solusi memang benar. Penyebabnya terlihat jika sembilan variabel disusun sebagai tabel $3 \times 3$: jumlah persamaan 1 sampai 3 dan jumlah persamaan 7 sampai 9 sama-sama berisi $x_1 + x_2 + \dots + x_9$, dengan ruas kanan $10 + 12 + 9 = 31$ dan $11 + 8.5 + 11.5 = 31$. Satu persamaan merupakan kombinasi linier persamaan lain, dan ruas kanannya konsisten.
+
+Kasus ini juga menguji toleransi. Bilangan kondisi $A$ menurut \texttt{numpy} sekitar $1.7 \times 10^{17}$, sehingga pivot terakhir dalam \textit{floating point} tidak benar-benar nol, melainkan sisa galat pembulatan. Jika batas nol terlalu ketat, pivot itu dapat dianggap sah dan program melaporkan solusi tunggal yang keliru dengan nilai sangat besar. Toleransi relatif mengenali pivot tersebut sebagai nol. Koefisien parameter juga cocok dengan basis ruang nol dari SymPy, misalnya koefisien $x_1$ bernilai $-1792953268688/3882420484875 \approx -0.462$.
+
+\subsection{Aplikasi Sistem Persamaan Linier}
+
+\begin{kasus}
+\ubag{Input}
+Data luas rumah dan harga: $(1, 3)$, $(2, 5)$, $(3, 6)$. Dengan $\sum x_i = 6$, $\sum x_i^2 = 14$, $\sum y_i = 14$, dan $\sum x_i y_i = 31$, persamaan normalnya
+\[
+\left[\begin{array}{cc|c}
+3 & 6 & 14 \\
+6 & 14 & 31
+\end{array}\right].
+\]
+\ubag{Output}
+\begin{center}
+Keempat metode: $\theta_0 = 1.667$, $\theta_1 = 1.5$, sehingga $y = 1.667 + 1.5x$.
+\end{center}
+\begin{center}\gambarkosong{Tangkapan layar aplikasi SPL}{3cm}\end{center}
+\end{kasus}
+
+\textbf{Analisis.} Nilai eksaknya $\theta_0 = 5/3$ dan $\theta_1 = 3/2$. Model ini tidak melalui ketiga titik secara tepat; pada $x = 2$, model memprediksi $4.667$ sedangkan data bernilai $5$. Hal ini wajar karena ketiga titik tidak segaris, dan persamaan normal memberi garis dengan jumlah kuadrat galat terkecil, bukan garis yang melalui semua titik.
+
+\subsection{Studi Kasus Interpolasi Polinomial}
+
+\subsubsection{Studi Kasus 1}
+\begin{kasus}
+\ubag{Input}
+\begin{center}
+\begin{tabular}{c|ccccccc}
+$x$ & 0.2 & 0.4 & 0.6 & 0.8 & 1.0 & 1.2 & 1.4 \\ \hline
+$f(x)$ & 0.182 & 0.336 & 0.470 & 0.588 & 0.693 & 0.788 & 0.875
+\end{tabular}
+\end{center}
+Evaluasi di $x = 0.3$, $0.55$, $0.95$, dan $1.38$.
+\ubag{Output}
+\[
+P(x) = 1.003x - 0.546x^2 + 0.479x^3 - 0.408x^4 + 0.208x^5 - 0.043x^6
+\]
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$x$ & $P(x)$ program & $\ln(1+x)$ & Selisih \\
+\midrule
+0.3  & 0.262 & 0.262 & $5.1 \times 10^{-4}$ \\
+0.55 & 0.438 & 0.438 & $1.3 \times 10^{-4}$ \\
+0.95 & 0.668 & 0.668 & $2.7 \times 10^{-5}$ \\
+1.38 & 0.867 & 0.867 & $4.3 \times 10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{center}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{interpol1}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{interpol1_eval}
+    \end{minipage}
+\end{center}\end{kasus}
+
+\textbf{Analisis.} Koefisien konstanta yang dihitung program bernilai $6.8 \times 10^{-13}$, sehingga tampil sebagai 0. Nilai pada tabel data cocok dengan $\ln(1+x)$ yang dibulatkan ke 3 desimal (misalnya $\ln 1.2 = 0.18232$), sehingga kami memakai $\ln(1+x)$ sebagai pembanding meskipun spesifikasi tidak menyebutkan fungsi asalnya. Selisihnya selalu di bawah $10^{-3}$ dan sebagian besar berasal dari pembulatan data masukan. Selisih terbesar muncul di $x = 0.3$ dan $x = 1.38$, di dekat ujung domain, sesuai dengan teori bahwa polinomial derajat tinggi paling tidak akurat di dekat ujung interval.
+
+\subsubsection{Studi Kasus 2: Suhu Komponen}
+\begin{kasus}
+\ubag{Input}
+\begin{center}
+\begin{tabular}{c|cccccc}
+$t$ (menit) & 0 & 2 & 4 & 6 & 8 & 10 \\ \hline
+$T$ ($^\circ$C) & 25.0 & 31.2 & 38.6 & 47.5 & 58.1 & 70.8
+\end{tabular}
+\end{center}
+Evaluasi di $t = 1$, $3.5$, $7$, dan $9.2$, serta cari waktu saat $T = 65^\circ$C.
+\ubag{Output}
+\[
+T(t) = 25 + 2.8925t + 0.069792t^2 + 0.020313t^3 - 0.0018229t^4 + 0.000078125t^5
+\]
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$t = 1$ & $t = 3.5$ & $t = 7$ & $t = 9.2$ \\
+\midrule
+$27.981$ & $36.617$ & $52.571$ & $65.425$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Komponen mencapai $65^\circ$C pada $t \approx 9.14$ menit.
+\begin{center}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{interpol2}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{interpol2_eval1}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \tangkapan{interpol2_eval2}
+    \end{minipage}
+\end{center}
+\end{kasus}
+
+\textbf{Analisis.} Jika dibulatkan ke 3 desimal sesuai aturan tampilan, koefisien $t^4$ menjadi $-0.002$ dan koefisien $t^5$ menjadi $0$. Pembulatan ini hanya berlaku pada tampilan; evaluasi $T(t)$ tetap memakai koefisien penuh, karena membuang suku $t^5$ di $t = 10$ akan mengubah hasil sekitar $7.8^\circ$C.
+
+Untuk mencari waktu kerusakan, kami mengevaluasi $T(t)$ berulang kali. $T(9.1) = 64.783$ dan $T(9.2) = 65.425$, jadi titik $65^\circ$C berada di antara keduanya. Evaluasi lanjutan memberi $T(9.13) = 64.975$ dan $T(9.14) = 65.039$; dengan mempersempit selang terus-menerus (metode bagi dua) diperoleh $t \approx 9.134$ menit. Turunan $T'(t)$ positif di seluruh $[0, 10]$ dengan nilai terkecil sekitar $2.89$ di $t = 0$, jadi suhu naik terus dan hanya ada satu waktu yang memenuhi. Nilai ini tetap perkiraan dari model, karena interpolasi hanya menjamin ketepatan di titik data.
+
+\subsection{Studi Kasus Interpolasi \textit{Natural Cubic Spline}}
+
+\begin{kasus}
+\ubag{Input}
+\begin{center}
+\begin{tabular}{c|ccccc}
+$x_i$ & 1 & 2 & 3 & 4 & 5 \\ \hline
+$y_i$ & 2 & 3 & 4 & 5 & 6
+\end{tabular}
+\end{center}
+\ubag{Output}
+Turunan kedua: $M_0 = M_1 = M_2 = M_3 = M_4 = 0$.
+\begin{align*}
+S_0(x) &= 2 + (x - 1), & 1 \le x \le 2, \\
+S_1(x) &= 3 + (x - 2), & 2 \le x \le 3, \\
+S_2(x) &= 4 + (x - 3), & 3 \le x \le 4, \\
+S_3(x) &= 5 + (x - 4), & 4 \le x \le 5 .
+\end{align*}
+Contoh evaluasi: $S(2.5) = 3.5$.
+
+\tangkapan{ncs_1}
+\tangkapan{ncs_2}
+\tangkapan{ncs_3}
+\tangkapan{ncs_4}
+\tangkapan{ncs_5}
+\tangkapan{ncs_6}
+\tangkapan{ncs_7}
+\tangkapan{ncs_8}
+\tangkapan{ncs_9}
+\tangkapan{ncs_10}
+\tangkapan{ncs_11}
+\tangkapan{ncs_12}
+\tangkapan{ncs_13}
+\tangkapan{ncs_14}
+\tangkapan{ncs_15}
+\tangkapan{ncs_16}
+\tangkapan{ncs_17}
+\end{kasus}
+
+\textbf{Analisis.} Data titik-titik pada kasus ini membentuk garis lurus $y = x + 1$. 
+Hasil interpolasi menunjukkan bahwa seluruh turunan kedua bernilai nol, 
+sehingga setiap segmen spline juga berbentuk garis lurus. 
+Dengan demikian, keempat segmen menghasilkan fungsi yang sama, yaitu 
+$y = x + 1$. Contohnya, pada $x = 2.5$ diperoleh $S(2.5) = 3.5$.
+
+\subsection{Studi Kasus Regresi Spline}
+
+\begin{kasus}
+\ubag{Input}
+Titik data $(1, 2)$, $(3, 6)$, $(5, 4)$. Spline linier ($d = 1$) dengan satu knot di $\xi = 3$, sehingga jumlah basisnya $M = 1 + 1 + 1 = 3$, sama dengan jumlah titik.
+\ubag{Output}
+\[
+\hat y(x) = 2x - 3(x - 3)_+, \qquad \hat y(1) = 2,\quad \hat y(3) = 6,\quad \hat y(5) = 4
+\]
+\begin{center}\gambarkosong{Tangkapan layar dan grafik regresi spline (GUI)}{4cm}\end{center}
+\end{kasus}
+
+\isi{Pastikan CLI dan GUI menyediakan pilihan derajat spline (1 atau 3). Tanpa pilihan ini, kasus ini tidak dapat dijalankan dari program karena bawaan SplineRegression adalah kubik.}
+
+\textbf{Analisis.} Untuk $x \le 3$, basis $(x-3)_+$ bernilai nol sehingga $\hat y = 2x$, garis yang melalui $(1, 2)$ dan $(3, 6)$. Untuk $x > 3$, $\hat y = 2x - 3(x - 3) = 9 - x$, garis yang melalui $(3, 6)$ dan $(5, 4)$. Karena jumlah basis sama dengan jumlah titik, $X$ persegi dan memiliki balikan, sehingga solusi kuadrat terkecil melalui semua titik dengan galat nol. Spline kubik dengan satu knot tidak dapat dipakai pada data ini karena membutuhkan $M = 5$ basis sementara hanya ada 3 titik; program menolaknya dengan pesan bahwa jumlah titik kurang dari jumlah basis.

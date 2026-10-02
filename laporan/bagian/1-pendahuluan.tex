@@ -1,0 +1,19 @@
+\section{Pendahuluan}
+
+\subsection{Deskripsi Masalah}
+
+Mitya, peneliti muda di Snezhnaya, sedang menjalankan Proyek Stuzha untuk mengendalikan fluktuasi energi ekstrem di Teyvat. Masalahnya sederhana tapi menghambat: ia masih memakai kalkulator saku tua yang sering error begitu diberi perhitungan berdimensi tinggi. Lewat Adventurers' Guild, Mitya meminta dibuatkan alat hitung otomatis yang sanggup menyelesaikan sistem matriks dan persamaan linier.
+
+Alat tersebut harus bisa menyelesaikan sistem persamaan linier (SPL), menghitung determinan, dan mencari matriks balikan. Alat yang sama juga dipakai untuk memetakan data eksperimen, sehingga perlu fitur interpolasi polinomial, interpolasi \textit{natural cubic spline}, dan regresi spline kubik.
+\subsection{Latar Belakang}
+
+Sebagian besar permasalahan yang dibahas pada tugas ini pada akhirnya berkaitan dengan persoalan penyelesaian SPL. Pada interpolasi polinomial, SPL diperoleh melalui pembentukan matriks Vandermonde. Sementara itu, interpolasi \textit{natural cubic spline} menghasilkan SPL berbentuk tridiagonal, sedangkan regresi spline menggunakan persamaan normal $(X^TX)\beta = X^Ty$. Oleh karena itu, \textit{library} yang dikembangkan disusun secara bertahap, dimulai dari operasi dasar pada matriks melalui kelas \texttt{Matrix}, kemudian dilanjutkan dengan implementasi metode eliminasi, determinan, dan matriks balikan. Metode-metode tersebut selanjutnya menjadi dasar untuk mengembangkan fitur interpolasi dan regresi.
+
+\subsection{Tujuan}
+
+Tugas besar ini memiliki beberapa tujuan sebagai berikut:
+\begin{enumerate}[nosep]
+\item mengimplementasikan secara mandiri dalam Java berbagai metode penyelesaian SPL, yaitu eliminasi Gauss, Gauss-Jordan, matriks balikan, dan kaidah Cramer, serta metode perhitungan determinan, matriks balikan, interpolasi polinomial, \textit{natural cubic spline}, dan regresi spline kubik;
+\item membangun metode-metode tersebut menjadi sebuah \textit{library} yang modular, terdokumentasi, dan dapat digunakan kembali melalui program berbasis CLI maupun GUI;
+\item melakukan pengujian terhadap \textit{library} menggunakan kasus-kasus uji yang ditentukan dalam Bab 5 dokumen spesifikasi serta menganalisis hasil yang diperoleh, termasuk mengamati perbedaan hasil antar-metode yang dapat muncul.
+\end{enumerate}

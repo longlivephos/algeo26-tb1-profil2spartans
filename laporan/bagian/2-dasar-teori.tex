@@ -1,0 +1,166 @@
+\clearpage
+\section{Dasar Teori}
+
+\subsection{Sistem Persamaan Linier}
+
+SPL dengan $m$ persamaan dan $n$ variabel dapat ditulis sebagai $Ax = b$, dengan $A$ merupakan matriks koefisien berukuran $m \times n$, $x$ vektor variabel, dan $b$ vektor konstanta. Dalam program, SPL disimpan sebagai matriks \textit{augmented} $[A\,|\,b]$ berukuran $m \times (n+1)$. Sebuah SPL bisa memiliki solusi tunggal, tak hingga banyak solusi, atau tidak memiliki solusi sama sekali.
+
+Ketiga kemungkinan solusi tersebut dapat diketahui melalui rank \cite{anton}. Jika $\operatorname{rank}(A) < \operatorname{rank}([A\,|\,b])$ terdapat baris berbentuk $0 = c$ dengan $c \neq 0$ yang membuat SPL tidak konsisten. Jika kedua rank sama dan bernilai $n$ maka  solusinya tunggal. Jika kedua rank sama tetapi kurang dari $n$ maka terdapat $n - \operatorname{rank}(A)$ variabel bebas dan solusinya ditulis dalam bentuk parametrik.
+
+\subsubsection{Operasi Baris Elementer}
+
+Ketiga operasi baris elementer (OBE) adalawh sebagai berikut tanpa mengubah himpunan solusi SPL:
+\begin{enumerate}[nosep]
+  \item menukar dua baris;
+  \item mengalikan sebuah baris dengan konstanta tidak nol;
+  \item menambahkan kelipatan sebuah baris ke baris lain.
+\end{enumerate}
+
+\subsubsection{Eliminasi Gauss}
+
+Eliminasi Gauss memakai OBE untuk mengubah $[A\,|\,b]$ menjadi matriks eselon baris. Setiap baris tidak nol diawali angka 1 (satu utama) dan satu utama pada baris di bawahnya selalu terletak lebih ke kanan. Setelah bentuk eselon tercapai, selanjutnya nilai variabel dicari dari baris paling bawah ke atas dengan substitusi mundur:
+\[
+x_i = b'_i - \sum_{j=i+1}^{n} a'_{ij}\, x_j .
+\]
+
+\subsubsection{Eliminasi Gauss-Jordan}
+
+Gauss-Jordan melanjutkan eliminasi Gauss sampai matriks berbentuk eselon baris tereduksi dimana setiap kolom yang memuat satu utama bernilai nol di semua baris lain. Pada bentuk ini solusi dapat langsung dibaca dari kolom terakhir tanpa substitusi mundur.
+
+\subsubsection{\textit{Partial Pivoting}}
+
+Komputer menyimpan bilangan real sebagai \textit{floating point} dengan presisi terbatas (sekitar 16 digit desimal untuk tipe data \texttt{double}). Jika elemen pivot sangat kecil, faktor pengali $a_{ik}/a_{kk}$ menjadi sangat besar dan galat pembulatan ikut membesar. \textit{Partial pivoting} mencegah hal ini dengan memilih baris yang memiliki nilai mutlak terbesar pada kolom yang sedang diproses lalu menukarnya ke posisi pivot.
+
+\subsubsection{Metode Matriks Balikan}
+
+Jika $A$ merupakan matriks berukuran $m$ $x$ $m$ persegi dan memiliki balikan, kedua ruas $Ax = b$ dapat dikalikan dari kiri dengan $A^{-1}$ sehingga
+\[
+x = A^{-1} b .
+\]
+Metode ini hanya berlaku untuk SPL dengan jumlah persamaan ($baris$) sama dengan jumlah variabel($kolom$) dan $\det(A) \neq 0$.
+
+\subsubsection{Kaidah Cramer}
+
+Untuk $A$ berukuran $n \times n$ dengan $\det(A) \neq 0$, solusi tunggal SPL adalah
+\[
+x_k = \frac{\det(A_k)}{\det(A)}, \qquad k = 1, 2, \dots, n,
+\]
+dengan $A_k$ adalah matriks $A$ yang kolom ke-$k$-nya diganti vektor $b$. Kaidah ini membutuhkan $n+1$ perhitungan determinan, sehingga jauh lebih lambat daripada eliminasi untuk $n$ besar.
+
+\subsection{Determinan Matriks}
+
+Determinan adalah skalar yang dihitung dari matriks persegi $A$ dan ditulis $\det(A)$ atau $|A|$. Matriks persegi memiliki balikan jika dan hanya jika $\det(A) \neq 0$. Matriks yang tidak persegi tidak memiliki determinan. Untuk memperoleh determinan sebuah matriks dapat dilakukan dengan metode berikut ini.
+
+\subsubsection{Metode Reduksi Baris}
+
+Metode ini mengubah $A$ menjadi matriks segitiga atas $U$ dengan OBE, lalu memakai sifat bahwa determinan matriks segitiga sama dengan hasil kali elemen diagonalnya. Pengaruh tiap OBE terhadap determinan harus dicatat, yaitu:
+\begin{itemize}[nosep]
+  \item menukar dua baris membalik tanda determinan;
+  \item mengalikan baris dengan $k$ mengalikan determinan dengan $k$;
+  \item menambahkan kelipatan baris ke baris lain tidak mengubah determinan.
+\end{itemize}
+Jika hanya operasi tukar baris dan penambahan kelipatan yang dipakai, dengan $s$ kali pertukaran baris, maka berlaku :
+\[
+\det(A) = (-1)^{s} \prod_{i=1}^{n} u_{ii} .
+\]
+
+\subsubsection{Metode Ekspansi Kofaktor}
+
+Minor $M_{ij}$ adalah determinan submatriks yang tersisa setelah baris ke-$i$ dan kolom ke-$j$ dihapus. Kofaktornya adalah $C_{ij} = (-1)^{i+j} M_{ij}$. Determinan dapat dihitung dengan ekspansi sepanjang baris ke-$i$ mana pun,
+\[
+\det(A) = \sum_{j=1}^{n} a_{ij}\, C_{ij},
+\]
+atau sepanjang kolom mana pun karena $\det(A) = \det(A^T)$. Memilih baris atau kolom dengan elemen nol terbanyak perlu diperhatikan untukmengurangi jumlah minor yang perlu dihitung. Meskipun demikian, kompleksitasnya tetap $O(n!)$ sehingga metode ini hanya praktis untuk matriks kecil.
+
+\subsection{Matriks Balikan}
+
+Balikan dari matriks persegi $A$ adalah matriks $A^{-1}$ yang memenuhi $AA^{-1} = A^{-1}A = I$.
+
+\subsubsection{Metode Augmentasi}
+
+Matriks $A$ digabung dengan matriks identitas menjadi $[A\,|\,I]$, lalu direduksi dengan Gauss-Jordan. Jika bagian kiri berhasil menjadi $I$ maka bagian kanan adalah $A^{-1}$:
+\[
+[A\,|\,I] \xrightarrow{\text{OBE}} [I\,|\,A^{-1}] .
+\]
+Jika selama proses muncul kolom tanpa pivot tak nol, dapat diketahui bahwa $A$ adalah matriks singular dan tidak memiliki balikan.
+
+\subsubsection{Metode Adjoin}
+
+Matriks kofaktor $C$ berisi seluruh kofaktor $C_{ij}$. Adjoin dari $A$ adalah transpose matriks kofaktor, $\operatorname{adj}(A) = C^T$. Balikan dihitung dengan
+\[
+A^{-1} = \frac{1}{\det(A)}\, \operatorname{adj}(A), \qquad \det(A) \neq 0 .
+\]
+
+\subsection{Interpolasi Polinomial}
+
+Diberikan $n+1$ titik $(x_0, y_0), \dots, (x_n, y_n)$ dengan nilai $x_i$ berbeda, terdapat tepat satu polinomial berderajat paling tinggi $n$,
+\[
+P_n(x) = a_0 + a_1 x + a_2 x^2 + \dots + a_n x^n ,
+\]
+yang melalui semua titik tersebut. Substitusi setiap titik menghasilkan SPL $Va = y$ dengan $V$ matriks Vandermonde:
+\[
+\begin{bmatrix}
+1 & x_0 & x_0^2 & \cdots & x_0^n \\
+1 & x_1 & x_1^2 & \cdots & x_1^n \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_n & x_n^2 & \cdots & x_n^n
+\end{bmatrix}
+\begin{bmatrix} a_0 \\ a_1 \\ \vdots \\ a_n \end{bmatrix}
+=
+\begin{bmatrix} y_0 \\ y_1 \\ \vdots \\ y_n \end{bmatrix}.
+\]
+Matriks Vandermonde memiliki balikan selama semua $x_i$ berbeda. Namun, matriks ini cepat menjadi \textit{ill-conditioned} ketika jumlah titik bertambah atau nilai $x_i$ berdekatan, sehingga koefisien yang dihasilkan rentan terhadap galat pembulatan. Setelah koefisien diperoleh, $P_n(x_t)$ dapat dievaluasi untuk sembarang $x_t$ di dalam domain $[x_0, x_n]$.
+
+\subsection{\textit{Natural Cubic Spline Interpolation}}
+
+Polinomial berderajat tinggi cenderung berosilasi di dekat ujung interval. Spline kubik menghindari batas interval tersebut dengan memakai polinomial kubik terpisah pada setiap subinterval $[x_j, x_{j+1}]$, $j = 0, \dots, n-1$:
+\[
+S_j(x) = a_j + b_j (x - x_j) + c_j (x - x_j)^2 + d_j (x - x_j)^3 .
+\]
+Ada $4n$ koefisien yang dicari. Syaratnya, kurva harus melalui semua titik, nilai, turunan pertama, dan turunan kedua kontinu di setiap simpul dalam. Syarat-syarat ini akan menghasilkan $4n - 2$ persamaan. Dua persamaan sisanya berasal dari syarat batas natural, yaitu turunan kedua di kedua ujung bernilai nol:
+\[
+S''(x_0) = S''(x_n) = 0 .
+\]
+
+\subsubsection{Sistem Tridiagonal}
+
+Dengan $h_j = x_{j+1} - x_j$ dan $a_j = y_j$, seluruh syarat di atas dapat direduksi menjadi SPL yang hanya melibatkan $c_0, \dots, c_n$ \cite{burden}:
+\[
+h_{j-1}\, c_{j-1} + 2(h_{j-1} + h_j)\, c_j + h_j\, c_{j+1}
+= \frac{3}{h_j}(a_{j+1} - a_j) - \frac{3}{h_{j-1}}(a_j - a_{j-1}),
+\quad j = 1, \dots, n-1,
+\]
+ditambah $c_0 = 0$ dan $c_n = 0$ dari syarat batas natural. Setiap persamaan hanya melibatkan tiga variabel yang bersebelahan sehingga matriks koefisiennya tridiagonal dan dominan diagonal. Matriks seperti ini selalu memiliki balikan sehingga SPL-nya selalu memiliki solusi tunggal.
+
+Setelah semua $c_j$ diketahui, koefisien lain dihitung dengan
+\[
+b_j = \frac{a_{j+1} - a_j}{h_j} - \frac{h_j}{3}(2c_j + c_{j+1}), \qquad
+d_j = \frac{c_{j+1} - c_j}{3h_j} .
+\]
+Karena $S_j''(x_j) = 2c_j$, turunan kedua pada knot ke-$j$ adalah $M_j = 2c_j$. Syarat batas natural $M_0 = M_n = 0$ setara dengan $c_0 = c_n = 0$.
+
+\subsection{Regresi Spline Kubik}
+
+Regresi spline tidak mengharuskan kurva melalui setiap titik. Kurva dicari sedemikian rupa sehingga jumlah kuadrat galatnya minimum. Kurva tersusun atas potongan polinomial yang tersambung pada knot $\xi_1 < \xi_2 < \dots < \xi_K$.
+
+\subsubsection{\textit{Truncated Power Basis}}
+
+Spline berderajat $d$ dengan $K$ knot dapat dinyatakan sebagai kombinasi linier dari $M = d + 1 + K$ fungsi basis \cite{hastie}:
+\[
+f(x) = \sum_{j=0}^{d} \beta_j x^j + \sum_{k=1}^{K} \beta_{d+k}\, (x - \xi_k)_+^{d},
+\qquad
+(u)_+ = \max(0, u) .
+\]
+Untuk spline kubik ($d = 3$), basisnya adalah $1, x, x^2, x^3$ ditambah $(x - \xi_k)_+^3$ untuk setiap knot, sehingga $M = 4 + K$. Fungsi $(x - \xi_k)_+^3$ bernilai nol di kiri knot dan turunan pertama serta keduanya kontinu di $\xi_k$ sehingga $f$ otomatis kontinu hingga turunan kedua tanpa persamaan tambahan. Untuk $d = 1$, basis $(x - \xi_k)_+$ menghasilkan garis patah yang tersambung di setiap knot.
+
+\subsubsection{Matriks Desain dan Persamaan Normal}
+
+Untuk $N$ titik data, setiap baris matriks desain $X \in \mathbb{R}^{N \times M}$ berisi nilai semua fungsi basis di $x_i$ dan model ditulis $y = X\beta + \epsilon$. Jika $N > M$, SPL $X\beta = y$ umumnya tidak konsisten. Solusi kuadrat terkecil $\hat\beta$ adalah vektor yang membuat $X\hat\beta$ menjadi proyeksi ortogonal $y$ ke ruang kolom $X$. Syaratnya, vektor sisa tegak lurus terhadap semua kolom $X$:
+\[
+X^T(y - X\hat\beta) = 0
+\quad\Longrightarrow\quad
+(X^TX)\hat\beta = X^Ty .
+\]
+Persamaan terakhir disebut persamaan normal. Jika kolom-kolom $X$ bebas linier, $X^TX$ simetris definit positif dan $\hat\beta$ tunggal. Syarat ini gagal jika jumlah titik kurang dari $M$ atau jika ada selang antar-knot yang tidak berisi cukup titik data tersebut.
+
+Persamaan normal memiliki bilangan kondisi kira-kira kuadrat dari bilangan kondisi $X$. Kolom $x^3$ yang bernilai besar di samping kolom $1$ yang bernilai kecil membuat $X^TX$ mudah menjadi \textit{ill-conditioned}. Salah satu cara umum menanganinya adalah menskalakan $x$ ke rentang $[-1, 1]$ sebelum membentuk $X$.

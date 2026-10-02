@@ -1,0 +1,115 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm,headheight=44pt,headsep=12pt,footskip=30pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,calc}
+\usepackage{microtype}
+\usepackage{needspace}
+\usepackage[hidelinks]{hyperref}
+\usepackage{setspace}
+\setstretch{1.15}
+
+\newcommand{\namakelompok}{Profil2Spartans}
+\newcommand{\nomorkelompok}{15}
+\newcommand{\semester}{Semester I Tahun 2026/2027}
+\newcommand{\repourl}{https://github.com/longlivephos/algeo26-tb1-profil2spartans}
+\newcommand{\isi}[1]{\textcolor{red}{[#1]}}
+\renewcommand{\contentsname}{Daftar Isi}
+\renewcommand{\listfigurename}{Daftar Gambar}
+\renewcommand{\listtablename}{Daftar Tabel}
+\renewcommand{\figurename}{Gambar}
+\renewcommand{\tablename}{Tabel}
+\renewcommand{\refname}{Daftar Pustaka}
+
+\newlength{\tinggilogo}\setlength{\tinggilogo}{1.1cm}
+\newlength{\jaraklogo}\setlength{\jaraklogo}{9pt}
+\newcommand{\logoheader}{%
+  \includegraphics[height=\tinggilogo]{gambar/logo-itb.png}\hspace{\jaraklogo}%
+  \includegraphics[height=\tinggilogo]{gambar/logo-stei.png}\hspace{\jaraklogo}%
+  \includegraphics[height=\tinggilogo,width=1.9cm,keepaspectratio]{gambar/sampul-kelompok.png}}
+\newcommand{\teksheader}{%
+  \footnotesize\setstretch{1.0}%
+  IF2123 Aljabar Linier dan Geometri\\
+  Laporan Tugas Besar 1\\
+  \semester}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\parbox[b]{\headwidth}{%
+  \begin{minipage}[c]{0.55\headwidth}\raggedright\logoheader\end{minipage}%
+  \begin{minipage}[c]{0.45\headwidth}\raggedleft\teksheader\end{minipage}%
+  \par\vspace{-3pt}\mbox{}}}
+\fancyfoot[L]{\small Kelompok \namakelompok}
+\fancyfoot[R]{\small Halaman \thepage{} dari \pageref*{LastPage}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+
+\definecolor{abuhead}{gray}{0.93}
+\definecolor{komentar}{RGB}{34,120,60}
+\definecolor{hijaubox}{RGB}{42,140,90}
+
+\newtcolorbox{kelas}[1]{breakable, enhanced, sharp corners,
+  before={\par\vspace{6pt}\needspace{8\baselineskip}\noindent}, after={\par\vspace{6pt}},
+  colback=white, colframe=black!75, boxrule=0.5pt,
+  left=6pt, right=6pt, top=0pt, bottom=6pt,
+  before upper={\setlength{\parskip}{2pt}\small},
+  title={\normalsize\bfseries #1}, fonttitle=\bfseries,
+  colbacktitle=abuhead, coltitle=black, titlerule=0.5pt}
+\newcommand{\kbag}[1]{\par\vspace{5pt}\noindent
+  \colorbox{abuhead}{\parbox{\dimexpr\linewidth-2\fboxsep}{\bfseries #1}}\par\vspace{2pt}}
+\newcommand{\sig}[1]{\par\noindent\texttt{#1}}
+\newcommand{\kom}[1]{\par\noindent\hspace*{1em}{\color{komentar}// #1}}
+
+\newtcolorbox{kasus}{breakable, enhanced, sharp corners,
+  before={\par\vspace{6pt}\noindent}, after={\par\vspace{6pt}},
+  colback=white, colframe=black!75, boxrule=0.5pt,
+  left=6pt, right=6pt, top=0pt, bottom=6pt,
+  before upper={\setlength{\parskip}{4pt}}}
+  
+\newcommand{\ubag}[1]{\par\vspace{4pt}\noindent
+  \colorbox{abuhead}{\parbox{\dimexpr\linewidth-2\fboxsep}{\centering\bfseries #1}}\par\vspace{2pt}}
+
+\newtcolorbox{komentar}[1]{enhanced, arc=4pt, boxrule=0.6pt,
+  colback=hijaubox!8, colframe=hijaubox!70!black,
+  attach boxed title to top left={xshift=6pt, yshift=-3mm},
+  boxed title style={sharp corners, colback=hijaubox, boxrule=0pt},
+  fonttitle=\bfseries\small\color{white}, title={#1}, top=5mm}
+
+\lstset{basicstyle=\ttfamily\footnotesize, columns=fullflexible,
+  breaklines=true, frame=single, framerule=0.3pt,
+  backgroundcolor=\color{black!3}, showstringspaces=false}
+
+\newcommand{\tangkapan}[1]{%
+  \begin{center}
+    \includegraphics[width=0.9\linewidth,height=0.85\textheight,keepaspectratio]{gambar/#1}   \end{center} }
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{3em}
+
+\begin{document}
+
+\input{bagian/sampul}
+
+\input{bagian/1-pendahuluan}
+\input{bagian/2-dasar-teori}
+\input{bagian/3-implementasi}
+\input{bagian/4-eksperimen}
+\input{bagian/5-penutup}
+\input{bagian/6-daftar-pustaka}
+\input{bagian/7-lampiran}
+
+\end{document}

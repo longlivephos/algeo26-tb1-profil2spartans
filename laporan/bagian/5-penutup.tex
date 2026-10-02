@@ -1,0 +1,43 @@
+\clearpage
+\section{Penutup}
+
+\subsection{Kesimpulan}
+
+Kami berhasil membangun pustaka aljabar linier dalam Java tanpa pustaka matematika eksternal. Pustaka ini mencakup empat metode SPL, dua metode determinan, dua metode matriks balikan, interpolasi polinomial, \textit{natural cubic spline}, dan regresi spline. Semua kasus uji pada spesifikasi menghasilkan jawaban yang sesuai dengan perhitungan eksak, termasuk kasus yang tidak memiliki solusi, kasus dengan tak hingga solusi, dan matriks singular.
+
+Kelebihan sistem yang kami bangun:
+\begin{itemize}[nosep]
+  \item fitur lanjutan memakai ulang solver yang sama (spline memakai Gauss-Jordan, regresi memakai eliminasi Gauss, interpolasi memakai augmentasi) sehingga perbaikan pada satu solver langsung dirasakan semua fitur;
+  \item toleransi nol yang relatif terhadap skala matriks yang membuat kasus hampir singular seperti SPL 9 variabel tetap terdeteksi dengan benar;
+  \item determinan pada kaidah Cramer disimpan sebagai mantisa dan eksponen agar tidak \textit{overflow} pada matriks besar;
+  \item masukan manual dan berkas melewati parser yang sama, begitu pula CLI dan GUI memakai penyusun teks hasil yang sama sehingga hasilnya konsisten.
+\end{itemize}
+
+Kekurangan yang kami sadari:
+\begin{itemize}[nosep]
+  \item \texttt{OBE}, \texttt{Kofaktor}, dan \texttt{Augmentasi} masih memakai toleransi tetap $10^{-12}$, belum toleransi relatif seperti solver SPL;
+  \item pembulatan tampilan ke 3 desimal dapat membuat dua metode yang sama-sama benar terlihat berbeda, seperti determinan kasus uji 3 ($14.852$ dan $14.853$);
+  \item interpolasi polinomial membentuk balikan matriks Vandermonde secara eksplisit, padahal matriks ini mudah menjadi \textit{ill-conditioned};
+  \item SPL tridiagonal pada spline diselesaikan dengan Gauss-Jordan umum berkompleksitas $O(n^3)$, bukan algoritma khusus tridiagonal. Dengan batas 10 titik, hal ini belum berpengaruh pada kecepatan;
+  \item ekspansi kofaktor dan metode adjoin dibatasi ukurannya karena kompleksitasnya terlalu besar.
+\end{itemize}
+
+\subsection{Saran}
+
+Toleransi pada kelas determinan dan balikan sebaiknya diseragamkan dengan kelas \texttt{Toleransi}, agar semua metode memutuskan ``nol'' dengan cara yang sama. Untuk interpolasi, koefisien dapat dicari dengan menyelesaikan $Va = y$ langsung memakai eliminasi Gauss dengan \textit{partial pivoting}, tanpa membentuk $V^{-1}$, atau diganti dengan bentuk Newton yang tidak memerlukan matriks Vandermonde. SPL tridiagonal pada spline dapat diselesaikan dengan algoritma Thomas yang berkompleksitas $O(n)$ jika batas jumlah titik ingin dinaikkan. Untuk masalah pembulatan tampilan, program dapat menambahkan opsi untuk menampilkan lebih banyak digit ketika pengguna ingin membandingkan metode.
+
+\subsection{Refleksi Anggota}
+
+\isi{Setiap anggota menulis satu atau dua paragraf dengan kata-kata sendiri: bagian yang dikerjakan, kendala yang dihadapi, dan hal baru yang dipelajari. Contoh kendala nyata dari riwayat commit kelompok: determinan yang overflow, metode adjoin yang kehabisan memori, toleransi yang diganti menjadi relatif, dan normalisasi x pada regresi.}
+
+\begin{komentar}{Refleksi 5.3.1: Neysa Alya Mukhbita}
+kapan lagi whimsymaxxing di algeo (makasih lewi udah mau nurutin kemauan ney n kate) :3 so far seru banget bisa belajar java, nyentuh latex lagi, dan implement materi2 di kelas. kendalanya di bagian aku mungkin yang library 5 karena susah dipahamin.. thx to StudySession @ yt walau ternyata metodenya beda sama yang di buku
+
+\end{komentar}
+
+\begin{komentar}{Refleksi 5.3.2: Jonathan Lewie}
+ semenjak ngerjain tubes jadi paham tiap tiap langkah kerja komputasi dari setiap metodenya yang dihasilkan di tiap librarynya, kenapa baru paham sekarang yak?? jujur insightful banget ngerjain tubes ini, enjoy selama mengerjakan tubesnya. mungkin kendala dari saya sendiri adalah terlalu terburu-buru dalam mengerjakan, terkadang menyepelekan hal yang kecil misalnya pembulatan dan semacamnya. disini saya dapat belajar bahwa mengerjakan java cukup menambah pengalaman, akhirnya saya tahu bagaimana sistem workflow bahasa pemrograman java ini, mungkin nextnya saya akan nyoba untuk mengaplikasikan pembelajaran ini untuk membuat plugin di minecraft java edition
+\end{komentar}
+
+\begin{komentar}{Refleksi 5.3.3: Cathrine Angel Siburian}
+ danyap akhirnya bisa dikerjakan juga tubesnya, awalnya sempet bingung sama sintaks2nya yang ada di java tapi lama-lama jadi little little i can lah ya. kendalanya banyak tapi tengs to my kelompok yang udah bantuin dan sama sama belajar hal baru ini barengan yey. Human error nya banyak but atleast we try^^

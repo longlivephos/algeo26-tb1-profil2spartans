@@ -2,7 +2,7 @@ package algeo.gui;
 
 import java.awt.Color;
 
-import javax.swing.JFrame;
+import javax.swing.JFrame; 
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
