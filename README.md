@@ -196,4 +196,4 @@ Bilangan dipisahkan spasi, satu baris matriks atau satu titik per baris, tanpa b
 ## Laporan dan Video
 
 - Laporan: [`docs/profil2spartans.pdf`](docs/profil2spartans.pdf)
-- Video penjelasan: _(tautan YouTube menyusul)_
+- Video penjelasan: https://youtu.be/vbZljX5lGHU?si=9NXRAqodG93jnZm0
