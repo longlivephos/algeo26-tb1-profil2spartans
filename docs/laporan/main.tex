@@ -8,11 +8,13 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{tabularx}
+\usepackage{adjustbox}
 \usepackage[table]{xcolor}
 \usepackage{enumitem}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
 \usepackage{caption}
+\usepackage{dirtree}
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
 \usepackage{tikz}
@@ -24,7 +26,7 @@
 \setstretch{1.15}
 
 \newcommand{\namakelompok}{Profil2Spartans}
-\newcommand{\nomorkelompok}{15}
+\newcommand{\nomorkelompok}{33}
 \newcommand{\semester}{Semester I Tahun 2026/2027}
 \newcommand{\repourl}{https://github.com/longlivephos/algeo26-tb1-profil2spartans}
 \newcommand{\isi}[1]{\textcolor{red}{[#1]}}
@@ -70,6 +72,8 @@
   colbacktitle=abuhead, coltitle=black, titlerule=0.5pt}
 \newcommand{\kbag}[1]{\par\vspace{5pt}\noindent
   \colorbox{abuhead}{\parbox{\dimexpr\linewidth-2\fboxsep}{\bfseries #1}}\par\vspace{2pt}}
+% \gambarkosong{keterangan}{tinggi}
+\newcommand{\gambarkosong}[2]{\fbox{\parbox[c][#2][c]{0.9\linewidth}{\centering\small\color{gray}#1}}}
 \newcommand{\sig}[1]{\par\noindent\texttt{#1}}
 \newcommand{\kom}[1]{\par\noindent\hspace*{1em}{\color{komentar}// #1}}
 

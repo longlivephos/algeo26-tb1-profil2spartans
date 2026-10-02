@@ -1,0 +1,67 @@
+\contentsline {section}{\numberline {1}Pendahuluan}{5}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Deskripsi Masalah}{5}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Latar Belakang}{5}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Tujuan}{5}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Dasar Teori}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Sistem Persamaan Linier}{6}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Operasi Baris Elementer}{6}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}Eliminasi Gauss}{6}{subsubsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.3}Eliminasi Gauss-Jordan}{6}{subsubsection.2.1.3}%
+\contentsline {subsubsection}{\numberline {2.1.4}\textit {Partial Pivoting}}{7}{subsubsection.2.1.4}%
+\contentsline {subsubsection}{\numberline {2.1.5}Metode Matriks Balikan}{7}{subsubsection.2.1.5}%
+\contentsline {subsubsection}{\numberline {2.1.6}Kaidah Cramer}{7}{subsubsection.2.1.6}%
+\contentsline {subsection}{\numberline {2.2}Determinan Matriks}{7}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Metode Reduksi Baris}{8}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Metode Ekspansi Kofaktor}{8}{subsubsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.3}Matriks Balikan}{8}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Metode Augmentasi}{8}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}Metode Adjoin}{9}{subsubsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.4}Interpolasi Polinomial}{9}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}\textit {Natural Cubic Spline Interpolation}}{9}{subsection.2.5}%
+\contentsline {subsubsection}{\numberline {2.5.1}Sistem Tridiagonal}{10}{subsubsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.6}Regresi \textit {Spline} Kubik}{10}{subsection.2.6}%
+\contentsline {subsubsection}{\numberline {2.6.1}\textit {Truncated Power Basis}}{10}{subsubsection.2.6.1}%
+\contentsline {subsubsection}{\numberline {2.6.2}Matriks Desain dan Persamaan Normal}{11}{subsubsection.2.6.2}%
+\contentsline {section}{\numberline {3}Implementasi}{12}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Struktur Folder dan Arsitektur}{12}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Kelas Dasar Matriks dan Utilitas}{13}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Sistem Persamaan Linier}{15}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Determinan dan Matriks Balikan}{17}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Interpolasi dan Regresi}{19}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Masukan dan Keluaran}{21}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}Keputusan Implementasi}{23}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}Alur Program}{24}{subsection.3.8}%
+\contentsline {subsubsection}{\numberline {3.8.1}Antarmuka Baris Perintah (CLI)}{24}{subsubsection.3.8.1}%
+\contentsline {subsubsection}{\numberline {3.8.2}Antarmuka Grafis (GUI)}{25}{subsubsection.3.8.2}%
+\contentsline {subsection}{\numberline {3.9}Maven dan Pembuatan Berkas \texttt {.jar}}{28}{subsection.3.9}%
+\contentsline {section}{\numberline {4}Eksperimen}{30}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Determinan Matriks}{30}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Kasus Uji 1}{30}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Kasus Uji 2}{31}{subsubsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.3}Kasus Uji 3}{31}{subsubsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.2}Invers Matriks}{32}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Kasus Uji 1}{32}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Kasus Uji 2}{35}{subsubsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.3}Sistem Persamaan Linier $Ax = b$}{38}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Kasus Uji 1}{38}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Kasus Uji 2}{42}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}Kasus Uji 3}{45}{subsubsection.4.3.3}%
+\contentsline {subsubsection}{\numberline {4.3.4}Kasus Uji 4: Matriks \textit {Discrete Laplacian}}{48}{subsubsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.4}SPL Berbentuk Matriks \textit {Augmented}}{69}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Kasus Uji 1}{69}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Kasus Uji 2}{73}{subsubsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.5}SPL Berbentuk Umum}{76}{subsection.4.5}%
+\contentsline {subsubsection}{\numberline {4.5.1}Kasus Uji 1}{76}{subsubsection.4.5.1}%
+\contentsline {subsubsection}{\numberline {4.5.2}Kasus Uji 2}{80}{subsubsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.6}Aplikasi Sistem Persamaan Linier}{90}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}Studi Kasus Interpolasi Polinomial}{92}{subsection.4.7}%
+\contentsline {subsubsection}{\numberline {4.7.1}Studi Kasus 1}{92}{subsubsection.4.7.1}%
+\contentsline {subsubsection}{\numberline {4.7.2}Studi Kasus 2: Suhu Komponen}{93}{subsubsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.8}Studi Kasus Interpolasi \textit {Natural Cubic Spline}}{94}{subsection.4.8}%
+\contentsline {subsection}{\numberline {4.9}Studi Kasus Regresi Spline}{100}{subsection.4.9}%
+\contentsline {section}{\numberline {5}Penutup}{105}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Kesimpulan}{105}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Saran}{106}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Refleksi Anggota}{106}{subsection.5.3}%
+\contentsline {section}{Daftar Pustaka}{107}{section*.7}%
+\contentsline {section}{Lampiran}{107}{section*.8}%

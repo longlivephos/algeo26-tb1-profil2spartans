@@ -10,7 +10,7 @@ Kelebihan sistem yang kami bangun:
   \item fitur lanjutan memakai ulang solver yang sama (spline memakai Gauss-Jordan, regresi memakai eliminasi Gauss, interpolasi memakai augmentasi) sehingga perbaikan pada satu solver langsung dirasakan semua fitur;
   \item toleransi nol yang relatif terhadap skala matriks yang membuat kasus hampir singular seperti SPL 9 variabel tetap terdeteksi dengan benar;
   \item determinan pada kaidah Cramer disimpan sebagai mantisa dan eksponen agar tidak \textit{overflow} pada matriks besar;
-  \item masukan manual dan berkas melewati parser yang sama, begitu pula CLI dan GUI memakai penyusun teks hasil yang sama sehingga hasilnya konsisten.
+  \item pada CLI, masukan manual dan masukan berkas melewati parser yang sama (\texttt{MatrixReader}) sehingga format yang ditolak dari keyboard juga ditolak dari berkas, dan kerangka teks hasil pada CLI maupun GUI sama-sama disusun oleh \texttt{OutputWriter}.
 \end{itemize}
 
 Kekurangan yang kami sadari:
@@ -19,16 +19,16 @@ Kekurangan yang kami sadari:
   \item pembulatan tampilan ke 3 desimal dapat membuat dua metode yang sama-sama benar terlihat berbeda, seperti determinan kasus uji 3 ($14.852$ dan $14.853$);
   \item interpolasi polinomial membentuk balikan matriks Vandermonde secara eksplisit, padahal matriks ini mudah menjadi \textit{ill-conditioned};
   \item SPL tridiagonal pada spline diselesaikan dengan Gauss-Jordan umum berkompleksitas $O(n^3)$, bukan algoritma khusus tridiagonal. Dengan batas 10 titik, hal ini belum berpengaruh pada kecepatan;
+  \item persamaan interpolasi polinomial dan \textit{spline} pada CLI masih ditulis oleh modulnya masing-masing, belum lewat \texttt{EquationFormatter} seperti di GUI, sehingga berkas \texttt{.txt} dari kedua antarmuka bisa berbeda tampilannya meskipun nilainya sama;
   \item ekspansi kofaktor dan metode adjoin dibatasi ukurannya karena kompleksitasnya terlalu besar.
 \end{itemize}
 
 \subsection{Saran}
 
-Toleransi pada kelas determinan dan balikan sebaiknya diseragamkan dengan kelas \texttt{Toleransi}, agar semua metode memutuskan ``nol'' dengan cara yang sama. Untuk interpolasi, koefisien dapat dicari dengan menyelesaikan $Va = y$ langsung memakai eliminasi Gauss dengan \textit{partial pivoting}, tanpa membentuk $V^{-1}$, atau diganti dengan bentuk Newton yang tidak memerlukan matriks Vandermonde. SPL tridiagonal pada spline dapat diselesaikan dengan algoritma Thomas yang berkompleksitas $O(n)$ jika batas jumlah titik ingin dinaikkan. Untuk masalah pembulatan tampilan, program dapat menambahkan opsi untuk menampilkan lebih banyak digit ketika pengguna ingin membandingkan metode.
+Toleransi pada kelas determinan dan balikan sebaiknya diseragamkan dengan kelas \texttt{Toleransi}, agar semua metode memutuskan ``nol'' dengan cara yang sama. Untuk interpolasi, koefisien dapat dicari dengan menyelesaikan $Va = y$ langsung memakai eliminasi Gauss dengan \textit{partial pivoting}, tanpa membentuk $V^{-1}$, atau diganti dengan bentuk Newton yang tidak memerlukan matriks Vandermonde. SPL tridiagonal pada spline dapat diselesaikan dengan algoritma Thomas yang berkompleksitas $O(n)$ jika batas jumlah titik ingin dinaikkan. Modul CLI interpolasi dan \textit{spline} juga sebaiknya memakai \texttt{EquationFormatter} supaya hasil simpanan CLI dan GUI benar-benar seragam. Untuk masalah pembulatan tampilan, program dapat menambahkan opsi untuk menampilkan lebih banyak digit ketika pengguna ingin membandingkan metode.
 
 \subsection{Refleksi Anggota}
 
-\isi{Setiap anggota menulis satu atau dua paragraf dengan kata-kata sendiri: bagian yang dikerjakan, kendala yang dihadapi, dan hal baru yang dipelajari. Contoh kendala nyata dari riwayat commit kelompok: determinan yang overflow, metode adjoin yang kehabisan memori, toleransi yang diganti menjadi relatif, dan normalisasi x pada regresi.}
 
 \begin{komentar}{Refleksi 5.3.1: Neysa Alya Mukhbita}
 kapan lagi whimsymaxxing di algeo (makasih lewi udah mau nurutin kemauan ney n kate) :3 so far seru banget bisa belajar java, nyentuh latex lagi, dan implement materi2 di kelas. kendalanya di bagian aku mungkin yang library 5 karena susah dipahamin.. thx to StudySession @ yt walau ternyata metodenya beda sama yang di buku
@@ -40,4 +40,5 @@ kapan lagi whimsymaxxing di algeo (makasih lewi udah mau nurutin kemauan ney n k
 \end{komentar}
 
 \begin{komentar}{Refleksi 5.3.3: Cathrine Angel Siburian}
- danyap akhirnya bisa dikerjakan juga tubesnya, awalnya sempet bingung sama sintaks2nya yang ada di java tapi lama-lama jadi little little i can lah ya. kendalanya banyak tapi tengs to my kelompok yang udah bantuin dan sama sama belajar hal baru ini barengan yey. Human error nya banyak but atleast we try^^
+ danyap akhirnya bisa dikerjakan juga tubesnya, awalnya sempet bingung sama sintaks2nya yang ada di java tapi lama-lama jadi little little i can lah ya. kendalanya banyak tapi tengs to my kelompok yang udah bantuin dan sama sama belajar hal baru ini barengan yey. Human error nya banyak but atleast we try\^{}\^{}
+\end{komentar}

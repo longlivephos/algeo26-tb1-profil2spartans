@@ -7,21 +7,31 @@ Program dikembangkan menggunakan Java 17 dan dibangun dengan Apache Maven. Kode 
 \subsection{Struktur Folder dan Arsitektur}
 
 \begin{lstlisting}
-src/main/java/algeo/
-|-- App.java                  titik masuk program (GUI atau CLI)
-|-- core/
-|   |-- matrix/               Matrix, MatrixException
-|   |-- util/                 Toleransi, NumberFormatter, DecimalParser
-|   |-- spl/                  GaussEliminationSolver, GaussJordan,
-|   |                         InverseMethod, Cramer, SPLResult, ...
-|   |-- interpolasi/          NaturalCubicSpline, InterpolasiResult, ...
-|   `-- regression/           SplineRegression, RegressionOutput
-|-- determinant/              OBE, Kofaktor
-|-- inverse/                  Augmentasi, Adjoin, InverseResult, ...
-|-- interpolasipolinomial/    Interpolasi
-|-- io/                       MatrixReader, OutputWriter
-|-- modules/                  menu dan submenu CLI
-`-- gui/                      tampilan Swing
+\dirtree{%
+.1 bin/.
+.1 docs/.
+.1 src/.
+.2 main/.
+.3 java/.
+.4 algeo/.
+.5 core/.
+.6 interpolasi/.
+.6 matrix/.
+.6 regression/.
+.6 spl/.
+.6 util/.
+.5 determinant/.
+.5 gui/.
+.6 component/.
+.6 page/.
+.5 interpolasipolinomial/.
+.5 inverse/.
+.5 io/.
+.5 modules/.
+.1 test/.
+.1 pom.xml.
+.1 README.md.
+}
 \end{lstlisting}
 
 Gambar~\ref{fig:arsitektur} menunjukkan hubungan antar paket dalam program, dengan panah yang menunjukkan penggunaan antar paket. Kelas \texttt{Matrix} menjadi dasar yang digunakan oleh paket-paket lainnya. Fitur seperti interpolasi dan regresi memanfaatkan solver SPL serta metode matriks balikan yang telah tersedia.
@@ -124,11 +134,11 @@ Metode untuk menampilkan proses perhitungan menghasilkan objek keluaran yang mem
 
 \subsection{Sistem Persamaan Linier}
 
-Keempat solver SPL memiliki bentuk pemanggilan yang sama, \texttt{solve(Matrix augmented)}, dan mengembalikan \texttt{SolverOutput}. Karena seragam, CLI dan GUI dapat memilih solver dari menu tanpa perlu kode khusus untuk tiap metode.
+Keempat \textit{solver} SPL kami buat dengan bentuk pemanggilan yang sama, yaitu \texttt{solve(Matrix augmented)}, dan semuanya mengembalikan \texttt{SolverOutput}. Dengan begitu, CLI dan GUI cukup memilih objek \textit{solver} sesuai dengan pilihan pengguna tanpa perlu kode khusus untuk setiap metode.
 
 \begin{kelas}{GaussEliminationSolver.java}
 \kbag{Spesifikasi}
-Eliminasi Gauss dengan \textit{partial pivoting}. Untuk setiap kolom, program mencari baris dengan nilai mutlak terbesar, menukarnya ke posisi pivot, membagi baris pivot agar menjadi satu utama, lalu mengenolkan elemen di bawahnya. Jika sebuah kolom tidak memiliki pivot tak nol (menurut \texttt{Toleransi}), kolom itu dicatat sebagai variabel bebas. Setelah eselon baris tercapai, program memeriksa baris \texttt{0 = c}; jika tidak ada dan rank sama dengan jumlah variabel, solusi dicari dengan substitusi mundur. Jika rank lebih kecil, solusi disusun dalam bentuk parametrik.
+Kelas ini menjalankan eliminasi Gauss dengan \textit{partial pivoting}. Untuk setiap kolom, program mencari baris yang nilai mutlaknya paling besar, menukar baris itu ke posisi pivot, membagi baris pivot agar pivotnya menjadi satu utama, lalu menolkan elemen di bawahnya. Kolom yang tidak memiliki pivot tak nol (berdasarkan kelas \texttt{Toleransi}) dicatat sebagai kolom variabel bebas. Setelah matriks berbentuk eselon baris, program memeriksa apakah ada baris \texttt{0 = c}. Jika ada, SPL dinyatakan tidak memiliki solusi. Jika tidak ada dan rank sama dengan jumlah variabel, solusi dihitung dengan substitusi mundur; jika rank lebih kecil, solusi disusun dalam bentuk parametrik.
 \kbag{Method}
 \sig{public SolverOutput solve(Matrix augmented) throws MatrixException} \kom{menyelesaikan [A|b] dan mencatat setiap OBE}
 \sig{private String bentukParametrik(...)} \kom{menyusun $x_i$ = konstanta + kombinasi parameter $t_1, t_2, \dots$}
@@ -136,14 +146,14 @@ Eliminasi Gauss dengan \textit{partial pivoting}. Untuk setiap kolom, program me
 
 \begin{kelas}{GaussJordan.java}
 \kbag{Spesifikasi}
-Sama seperti eliminasi Gauss, tetapi elemen di atas satu utama juga dinolkan sehingga matriks mencapai eselon baris tereduksi. Solusi tunggal langsung dibaca dari kolom terakhir tanpa substitusi mundur.
+Alurnya sama dengan \texttt{GaussEliminationSolver}, tetapi elemen di atas satu utama juga dinolkan sehingga matriks menjadi eselon baris tereduksi. Jika solusinya tunggal, nilai setiap variabel langsung diambil dari kolom terakhir.
 \kbag{Method}
 \sig{public SolverOutput solve(Matrix augmented) throws MatrixException}
 \end{kelas}
 
 \begin{kelas}{InverseMethod.java}
 \kbag{Spesifikasi}
-Memisahkan $A$ dan $b$ dari matriks \textit{augmented}, mencari $A^{-1}$ dengan Gauss-Jordan pada $[A\,|\,I]$, lalu menghitung $x = A^{-1}b$. Jika $A$ tidak persegi atau singular, metode ini melempar \texttt{MatrixException} berisi alasannya.
+Kelas ini memisahkan $A$ dan $b$ dari matriks \textit{augmented}, mencari $A^{-1}$ dengan Gauss-Jordan pada $[A\,|\,I]$, lalu menghitung $x = A^{-1}b$. Jika $A$ tidak persegi atau $\det(A) = 0$, kelas ini melempar \texttt{MatrixException} yang berisi alasannya, misalnya ``jumlah persamaan tidak sama dengan jumlah variabel''.
 \kbag{Method}
 \sig{public SolverOutput solve(Matrix augmented) throws MatrixException}
 \sig{public Matrix cariInvers(Matrix a, List<String> steps, boolean catat)} \kom{Gauss-Jordan dengan partial pivoting pada [A|I]}
@@ -151,7 +161,7 @@ Memisahkan $A$ dan $b$ dari matriks \textit{augmented}, mencari $A^{-1}$ dengan 
 
 \begin{kelas}{Cramer.java}
 \kbag{Spesifikasi}
-Menghitung $x_k = \det(A_k)/\det(A)$. Determinan dihitung dengan reduksi baris, tetapi hasil kali diagonal disimpan sebagai mantisa $\times\,10^{\text{eksponen}}$ dengan mantisa dijaga di rentang $[1, 10)$. Cara ini mencegah \textit{overflow} pada matriks besar. Ukuran dibatasi 300 variabel karena metode ini menghitung $n+1$ determinan.
+Kelas ini menghitung $x_k = \det(A_k)/\det(A)$ dengan determinan yang diperoleh dari reduksi baris. Hasil kali elemen diagonal tidak langsung disimpan dalam satu variabel \texttt{double}, tetapi dipecah menjadi mantisa dan eksponen ($\text{mantisa} \times 10^{\text{eksponen}}$ dengan $1 \le |\text{mantisa}| < 10$). Kami memakai cara ini agar hasil kali tersebut tidak mengalami \textit{overflow} pada matriks besar. Jumlah variabel dibatasi paling banyak 300 karena kaidah Cramer harus menghitung $n+1$ determinan.
 \kbag{Method}
 \sig{public SolverOutput solve(Matrix augmented) throws MatrixException}
 \sig{private double[] determinan(Matrix m, double tol)} \kom{mengembalikan \{mantisa, eksponen\}}
@@ -159,7 +169,7 @@ Menghitung $x_k = \det(A_k)/\det(A)$. Determinan dihitung dengan reduksi baris, 
 
 \begin{kelas}{SPLResult.java, SolverOutput.java, SPLFormatter.java}
 \kbag{Spesifikasi}
-\texttt{SPLResult} menyimpan jenis hasil (\texttt{UNIQUE}, \texttt{NO\_SOLUTION}, \texttt{INFINITE}) beserta vektor solusi atau deskripsi parametrik. \texttt{SolverOutput} membungkus \texttt{SPLResult} dan daftar langkah. \texttt{SPLFormatter} mengubah koefisien parametrik menjadi teks seperti \texttt{x1 = 3.9 - 2t1 - 2.9t2}.
+\texttt{SPLResult} menyimpan jenis hasil (\texttt{UNIQUE}, \texttt{NO\_SOLUTION}, atau \texttt{INFINITE}) beserta vektor solusi atau deskripsi parametriknya. \texttt{SolverOutput} membungkus \texttt{SPLResult} bersama daftar langkah. \texttt{SPLFormatter} mengubah koefisien parametrik menjadi teks, contohnya \texttt{x1 = 3.9 - 2t1 - 2.9t2}.
 \kbag{Method}
 \sig{public static SPLResult unique(double[] x)}, \texttt{noSolution()}, \texttt{infinite(String)}
 \sig{public static String parametrik(double[][] x, boolean[] adaPivot)}
@@ -259,7 +269,7 @@ Membentuk matriks Vandermonde $V$ dari titik data (maksimal 10 titik), mencari $
 
 \begin{kelas}{SplineRegression.java dan RegressionOutput.java}
 \kbag{Spesifikasi}
-Memvalidasi masukan (jumlah titik, knot terurut dan berada di dalam rentang data, jumlah titik tidak kurang dari jumlah basis), mengubah $x$ menjadi $u = (x-c)/s$ agar berada di $[-1, 1]$, membentuk matriks desain dengan \textit{truncated power basis}, lalu menyelesaikan $(X^{\top}X)\beta = X^{\top}y$ dengan \texttt{GaussEliminationSolver}. Koefisien dikembalikan ke bentuk $x$ sebelum ditampilkan. Derajat dapat dipilih 1, 2, atau 3.
+Sebelum menghitung, kelas ini memvalidasi masukan: jumlah titik paling banyak 10, \textit{knot} harus terurut naik dan berada di dalam rentang data, serta jumlah titik tidak boleh kurang dari jumlah basis. Selanjutnya, setiap $x$ diubah menjadi $u = (x - c)/s$, dengan $c$ titik tengah dan $s$ setengah lebar rentang data, sehingga $u$ berada di $[-1, 1]$. Matriks desain dibentuk dari $u$ dengan \textit{truncated power basis}, lalu $(X^{\top}X)\beta = X^{\top}y$ diselesaikan dengan \texttt{GaussEliminationSolver}. Koefisien yang didapat masih dalam variabel $u$ sehingga program mengubahnya kembali ke variabel $x$ sebelum ditampilkan. Jika pusat data jauh dari nol ($|c| > 10s$), persamaan ditampilkan dalam bentuk $(x - c)$ agar koefisiennya tidak terlalu besar. Derajat \textit{spline} dapat dipilih 1, 2, atau 3.
 \kbag{Method}
 \sig{public RegressionOutput solve(Matrix titik, double[] knot, int derajat)}
 \sig{public static double basis(int j, double t, double[] knot, int derajat)} \kom{nilai fungsi basis ke-j}
@@ -273,7 +283,7 @@ Memvalidasi masukan (jumlah titik, knot terurut dan berada di dalam rentang data
 \kbag{Spesifikasi}
 \textbf{Fungsionalitas:}
 \begin{itemize}
-\item Membaca masukan berupa teks atau berkas dan mengubahnya menjadi objek \texttt{Matrix}. Parser yang sama digunakan untuk masukan manual maupun berkas, termasuk data titik $(x,y)$ yang direpresentasikan sebagai matriks $n \times 2$.
+\item Membaca masukan berupa teks atau berkas dan mengubahnya menjadi objek \texttt{Matrix}, termasuk data titik $(x,y)$ yang disimpan sebagai matriks $n \times 2$. Pada CLI, masukan dari keyboard dirangkai dulu menjadi teks, lalu dibaca dengan \texttt{parseTeks}; aturan validasinya pun sama dengan masukan berkas. GUI hanya memakai kelas ini saat pengguna menekan tombol ``Buka File'', sedangkan isian manual di GUI dibaca langsung oleh \texttt{MatrixInput}.
 \end{itemize}
 
 \textbf{Alur kerja:}
@@ -294,23 +304,25 @@ Memvalidasi masukan (jumlah titik, knot terurut dan berada di dalam rentang data
 
 \begin{kelas}{OutputWriter.java}
 \kbag{Spesifikasi}
-\textbf{Fungsionalitas:}
-\begin{itemize}
-\item Menyusun teks keluaran yang memuat metode, masukan, langkah perhitungan, dan hasil, kemudian menyediakan fungsi untuk menyimpannya ke berkas \texttt{.txt}. Format keluaran digunakan secara konsisten oleh CLI dan GUI sehingga informasi hasil yang ditampilkan tetap sama.
-\end{itemize}
+Kelas ini menyusun teks keluaran untuk keenam fitur dengan urutan yang sama, yaitu nama metode, masukan, langkah perhitungan, lalu hasil, kemudian menyimpannya ke berkas \texttt{.txt} jika pengguna memintanya. CLI mencetak teks ini apa adanya, sedangkan GUI mengambil bagian setelah judul ``Hasil:'' untuk mengisi kotak HASIL. Untuk SPL, determinan, dan matriks balikan, CLI dan GUI memanggil method yang sama sehingga berkas yang disimpan dari keduanya berformat sama.
 
-\textbf{Alur kerja:}
-\begin{itemize}
-\item Menerima hasil perhitungan dan informasi langkah dari solver.
-\item Menyusun informasi menjadi teks sesuai dengan jenis operasi.
-\item Menghasilkan teks untuk SPL, determinan, invers, interpolasi, spline, dan regresi.
-\item Menampilkan teks hasil melalui CLI atau GUI.
-\item Menyimpan teks hasil ke berkas \texttt{.txt} jika diminta pengguna.
-\end{itemize}
+Pada interpolasi, \textit{spline}, dan regresi, teks persamaan dan daftar evaluasinya disusun dulu oleh pemanggil sebelum diteruskan ke \texttt{OutputWriter}, dan di sinilah CLI dan GUI mulai berbeda. Nilai yang dihitung tetap sama karena berasal dari kelas pustaka yang sama, tetapi cara penulisan persamaannya tidak. Modul interpolasi polinomial pada CLI menuliskan semua koefisien apa adanya, termasuk yang bernilai 0, sehingga kasus uji 5.7a tampil sebagai \texttt{0.0 + 1.003x\^{}1 + -0.546x\^{}2 + \ldots}. Halaman GUI memakai \texttt{EquationFormatter} yang membuang suku nol dan merapikan tanda menjadi \texttt{1.003x - 0.546x\^{}2 + \ldots}. Hal serupa terjadi pada \textit{spline}. Regresi tidak mengalami masalah ini karena CLI dan GUI sama-sama memanggil \texttt{getPersamaan()}; GUI hanya menambahkan daftar koefisien di bawahnya. Jadi, berkas \texttt{.txt} dari CLI dan GUI belum tentu identik untuk ketiga fitur tersebut walaupun angkanya sama.
 \kbag{Method}
-\sig{public static String teksSPL(String metode, Matrix aug, List<String> steps, SPLResult hasil)}
-\sig{public static String teksDeterminan(...)}, \texttt{teksInvers(...)} \kom{\isi{tambahkan teks untuk interpolasi, spline, dan regresi}}
-\sig{public static void simpan(String path, String isi) throws IOException}
+\sig{public static String teksSPL(String metode, Matrix augmented, List<String> steps, SPLResult hasil)}
+\sig{public static String teksDeterminan(String metode, Matrix input, List<String> steps, double determinan)}
+\sig{public static String teksInvers(String metode, Matrix input, List<String> steps, InverseResult hasil)}
+\sig{public static String teksInterpolasi(...)} \kom{ditambah domain, persamaan $P(x)$, dan daftar evaluasi $P(x_t)$}
+\sig{public static String teksSplineKubik(...)} \kom{ditambah domain, persamaan setiap segmen, dan daftar evaluasi $S(x_t)$}
+\sig{public static String teksRegresiSpline(...)} \kom{ditambah posisi \textit{knot}, persamaan regresi, dan daftar prediksi}
+\sig{public static void simpan(String path, String isi) throws IOException} \kom{berkas dengan nama yang sama akan ditimpa}
+\end{kelas}
+
+\begin{kelas}{EquationFormatter.java}
+\kbag{Spesifikasi}
+Kelas kecil ini mengubah koefisien hasil interpolasi menjadi teks persamaan. Saat ini kelas tersebut baru dipakai oleh halaman GUI interpolasi polinomial dan \textit{natural cubic spline}, sedangkan modul CLI untuk kedua fitur itu masih menyusun persamaannya sendiri. Angka 1 di depan variabel tidak ditulis, dan bentuk $(x - x_i)$ ditulis sebagai $(x + |x_i|)$ jika $x_i$ negatif. Koefisien yang bernilai 0 setelah dibulatkan ke 3 desimal juga tidak ditulis. Akibatnya, pada interpolasi suhu (kasus uji 5.7 b), suku seperti $0.000078125\,t^5$ tidak muncul di teks persamaan, padahal evaluasi $T(t)$ tetap memakai koefisien lengkap.
+\kbag{Method}
+\sig{public static String polinom(double[][] koef)} \kom{ruas kanan $P(x)$, misalnya \texttt{25 + 2.893x + 0.07x\^{}2}}
+\sig{public static String splineSegmen(double[] x, double[][] koef)} \kom{persamaan setiap segmen beserta domainnya, satu segmen per baris}
 \end{kelas}
 
 \subsection{Keputusan Implementasi}
@@ -320,7 +332,7 @@ Memvalidasi masukan (jumlah titik, knot terurut dan berada di dalam rentang data
 
 \item \textbf{Pembatasan ukuran untuk metode yang membutuhkan banyak perhitungan.} Metode ekspansi kofaktor dibatasi pada matriks dengan ukuran $n \le 11$ karena proses perhitungannya menjadi semakin berat ketika ukuran matriks bertambah. Batas ini juga disesuaikan dengan batas masukan secara manual. Metode adjoin dibatasi pada $n \le 100$ karena perlu menghitung $n^2$ determinan minor. Jika ukuran matriks melebihi batas tersebut, akan ditampilkan \textit{error message} yang mengarahkan untuk menggunakan metode lain yang lebih sesuai.
 
-\item \textbf{Normalisasi $x$ pada regresi.} Normalisasi dilakukan untuk mengurangi perbedaan skala yang terlalu besar pada data regresi. Misalnya, data $x$ berupa tahun 2000 hingga 2010 dapat menghasilkan nilai $x^3$ hingga orde $10^{10}$, sedangkan kolom konstanta hanya bernilai 1. Perbedaan skala tersebut dapat membuat matriks $X^{\top}X$ menjadi tidak stabil dan mendekati singular. Normalisasi membuat nilai $x$ berada pada skala yang lebih kecil sehingga perhitungan regresi dapat dilakukan dengan lebih stabil.
+\item \textbf{Normalisasi $x$ pada regresi.} Skala kolom-kolom matriks desain bisa sangat berbeda. Misalnya, jika $x$ berupa tahun 2000 sampai 2010, kolom $x^3$ bernilai sekitar $8 \times 10^{9}$, sedangkan kolom konstanta hanya bernilai 1. Setelah dikalikan menjadi $X^{\top}X$, perbedaan skala ini makin besar dan matriksnya hampir singular secara numerik. Dengan mengubah $x$ ke rentang $[-1, 1]$ terlebih dahulu, nilai setiap kolom paling besar 1 sehingga eliminasi berjalan lebih stabil.
 
 \item \textbf{Tidak mencatat langkah pada matriks berukuran besar.} Langkah perhitungan hanya disimpan untuk matriks dengan ukuran maksimum $11 \times 11$. Pada matriks kecil, pencatatan langkah berguna untuk menunjukkan proses perhitungan. Namun, untuk matriks besar, penyimpanan setiap matriks perantara membutuhkan memori yang sangat besar dan tidak praktis untuk ditampilkan. Sebagai contoh, matriks berukuran $1001 \times 1001$ memiliki lebih dari satu juta elemen. Oleh karena itu, kami memutuskan untuk tidak menampilkan langkah perhitungan untuk matriks yang berukuran besar.
 
@@ -328,11 +340,9 @@ Memvalidasi masukan (jumlah titik, knot terurut dan berada di dalam rentang data
 
 \subsection{Alur Program}
 
-\isi{Sesuaikan subbab ini setelah CLI dan GUI selesai. Isi di bawah mengikuti rancangan yang sudah disepakati kelompok.}
-
 \subsubsection{Antarmuka Baris Perintah (CLI)}
 
-Kelas \texttt{App} memeriksa argumen program. Jika argumennya \texttt{cli}, \texttt{App} menjalankan \texttt{MenuUtama}. Menu utama menampilkan tujuh pilihan sesuai spesifikasi, dan setiap fitur ditangani oleh satu kelas di paket \texttt{modules} yang mengimplementasikan antarmuka \texttt{Module}. Alur satu fitur ditunjukkan pada Gambar~\ref{fig:alur}.
+Kelas \texttt{App} memeriksa argumen program. Jika argumennya \texttt{cli}, \texttt{App} menjalankan \texttt{MenuUtama}; jika tidak ada argumen, yang dibuka adalah GUI. Menu utama menampilkan tujuh pilihan sesuai dengan spesifikasi, dan setiap fitur ditangani oleh satu kelas di paket \texttt{modules} yang mengimplementasikan antarmuka \texttt{Module}. Alur satu fitur ditunjukkan pada Gambar~\ref{fig:alur}. Jika masukan tidak valid atau metode yang dipilih tidak bisa dipakai (misalnya kaidah Cramer pada matriks dengan $\det(A) = 0$), modul hanya mencetak pesan galat lalu kembali ke menu utama, jadi program tidak berhenti di tengah jalan.
 
 \begin{figure}[H]
 \centering
@@ -349,14 +359,14 @@ Kelas \texttt{App} memeriksa argumen program. Jika argumennya \texttt{cli}, \tex
 \node[pilih, below=of c] (d) {Format\\valid?};
 \node[langkah, below=0.5cm of d] (e) {Pustaka menghitung hasil dan mencatat langkah};
 \node[langkah, below=of e] (f) {\texttt{OutputWriter} menyusun teks, CLI mencetaknya};
-\node[langkah, below=of f] (g) {Evaluasi $x_t$ (interpolasi dan regresi), lalu opsi simpan \texttt{.txt}};
-\node[langkah, right=1.6cm of d, minimum width=2.6cm, text width=2.4cm] (err) {Tampilkan pesan galat};
+\node[langkah, below=of f] (g) {Evaluasi $x_t$ (interpolasi, \textit{spline}, dan regresi), lalu opsi simpan \texttt{.txt}};
+\node[langkah, right=1.6cm of d, minimum width=2.6cm, text width=2.4cm] (err) {Tampilkan pesan galat, kembali ke menu};
 \draw[panah] (a) -- (b);
 \draw[panah] (b) -- (c);
 \draw[panah] (c) -- (d);
 \draw[panah] (d) -- node[right, font=\small]{ya} (e);
 \draw[panah] (d.east) -- node[above, font=\small]{tidak} (err.west);
-\draw[panah] (err.east) -- ++(0.4,0) |- (b.east);
+\draw[panah] (err.east) -- ++(0.4,0) |- (a.east);
 \draw[panah] (e) -- (f);
 \draw[panah] (f) -- (g);
 \end{tikzpicture}
@@ -367,14 +377,72 @@ Kelas \texttt{App} memeriksa argumen program. Jika argumennya \texttt{cli}, \tex
 
 \subsubsection{Antarmuka Grafis (GUI)}
 
-GUI dibuat dengan Java Swing. Kami memilih Swing karena sudah termasuk dalam JDK, sehingga \texttt{.jar} yang sama dapat dijalankan dengan \texttt{java -jar} tanpa pustaka tambahan. JavaFX sejak Java 11 terpisah dari JDK dan membutuhkan dependensi khusus sistem operasi.
+GUI dibuat dengan Java Swing. Kami memilih Swing karena sudah termasuk dalam JDK sehingga \texttt{.jar} yang sama dapat dijalankan dengan \texttt{java -jar} tanpa pustaka tambahan, sedangkan JavaFX sejak Java 11 terpisah dari JDK dan membutuhkan dependensi khusus sistem operasi.
 
-\isi{Jelaskan struktur GUI yang sudah jadi (MainFrame dengan JTabbedPane berisi enam tab fitur, panel langkah dengan tombol sebelumnya/berikutnya, panel grafik kurva dengan Graphics2D, tombol buka berkas dan simpan hasil), lalu buat kotak kelas untuk setiap kelas GUI seperti di atas.}
+Jendela GUI berisi enam tab, satu untuk setiap fitur, dan semua tab memakai tata letak yang sama (Gambar~\ref{fig:gui}). Panel kiri berisi masukan, opsi metode, dan tombol ``Buka File'', ``Hitung'', ``Simpan'', serta ``Reset''. Panel kanan menampilkan langkah perhitungan. Langkah-langkah itu sengaja tidak muncul sekaligus; program menambahkannya satu per satu dengan jeda 500 ms supaya pengguna bisa mengikuti perubahan matriksnya dari langkah ke langkah. Pada tab interpolasi, \textit{spline}, dan regresi, panel kanan dibagi lagi menjadi grafik di atas dan daftar langkah di bawah.
+
+Struktur kelasnya kami buat bertingkat agar keenam halaman tidak menulis ulang kode yang sama. \texttt{MainFrame} hanya menyusun tab, \texttt{FeaturePage} memegang semua bagian yang sama untuk setiap fitur, dan halaman turunannya cukup mengatur masukan serta memanggil kelas pustaka. Komponen yang dipakai berulang, yaitu isian matriks, kotak langkah, dan grafik, dipisahkan ke paket \texttt{gui.component}.
+
+\begin{kelas}{MainFrame.java}
+\kbag{Spesifikasi}
+Jendela utama berjudul ``Algeo Calculator by profil2spartans''. Kelas ini menyusun \texttt{JTabbedPane} berisi enam halaman fitur dan mengatur warna komponen Swing melalui \texttt{UIManager} sebelum jendela ditampilkan.
+\kbag{Method}
+\sig{public MainFrame()} \kom{menyusun enam tab dengan ukuran awal 1100 x 700 piksel}
+\sig{public static void tampilkan()} \kom{dipanggil oleh App, membuat jendela di \textit{event dispatch thread}}
+\end{kelas}
+
+\begin{kelas}{FeaturePage.java}
+\kbag{Spesifikasi}
+Kelas abstrak yang menjadi dasar keenam halaman fitur. Kelas ini menyusun panel kiri dan kanan, menangani keempat tombol, membuka dialog berkas yang langsung diarahkan ke folder \texttt{test}, dan menambahkan akhiran \texttt{.txt} jika pengguna lupa menuliskannya saat menyimpan. Penampilan langkah bertahap memakai \texttt{javax.swing.Timer}. Jumlah tukar baris dan operasi baris pada indikator dihitung dari teks langkah yang diawali ``Tukar baris'' atau berbentuk ``Baris $i$ = Baris $i$ \ldots''. Itu sebabnya fitur yang tidak memakai OBE secara langsung, seperti interpolasi polinomial, selalu menunjukkan angka 0 pada indikator tersebut.
+\kbag{Method}
+\sig{protected abstract void hitung() throws MatrixException} \kom{diisi oleh setiap halaman turunan}
+\sig{protected void tambahOpsi(JComponent... komponen)} \kom{menambah satu baris opsi, misalnya pilihan metode}
+\sig{protected void tambahGrafik(PlotPanel grafik)} \kom{membagi panel kanan menjadi grafik dan daftar langkah}
+\sig{protected void mulaiTampilkan(List<String> daftarLangkah, String teksLengkap)} \kom{menampilkan langkah satu per satu, lalu kotak HASIL}
+\sig{protected void tambahKeOutput(String baris)} \kom{menambah kotak hijau untuk hasil evaluasi atau prediksi}
+\end{kelas}
+
+\begin{kelas}{SplPage, DeterminantPage, InversePage, InterpolationPage, SplinePage, RegressionPage}
+\kbag{Spesifikasi}
+Keenam kelas ini merupakan turunan \texttt{FeaturePage}. Isinya hanya bagian yang khas untuk setiap fitur, yaitu bentuk masukan, opsi metode, dan pemanggilan kelas pustaka yang sesuai. Teks hasilnya disusun dengan method \texttt{OutputWriter} yang sama dengan yang dipakai CLI.
+\begin{itemize}
+\item \texttt{SplPage}: matriks \textit{augmented} sampai 11 persamaan dan 11 variabel, dengan pilihan empat metode SPL.
+\item \texttt{DeterminantPage} dan \texttt{InversePage}: matriks sampai $11 \times 11$, masing-masing dengan pilihan dua metode.
+\item \texttt{InterpolationPage} dan \texttt{SplinePage}: sampai 10 titik data, grafik kurva, dan isian $x_t$ yang bisa dievaluasi berulang kali. Jika $x_t$ berada di luar domain data, hasilnya diberi keterangan ekstrapolasi; khusus \textit{spline}, nilainya dihitung dengan segmen terdekat.
+\item \texttt{RegressionPage}: selain titik data, ada isian posisi \textit{knot}, pilihan derajat 1, 2, atau 3, dan isian $x_t$ untuk prediksi.
+\end{itemize}
+\end{kelas}
+
+\begin{kelas}{MatrixInput.java}
+\kbag{Spesifikasi}
+Komponen isian matriks atau titik data. Ukurannya diatur dengan \texttt{JSpinner}; setiap kali ukurannya berubah, kotak isian dibuat ulang, tetapi angka yang sudah diketik pada posisi yang masih ada tetap dipertahankan. Angka dibaca dengan \texttt{DecimalParser} sehingga tanda desimal titik maupun koma sama-sama diterima. Kelas ini punya dua konstruktor: satu untuk matriks (dengan kolom $b$ tambahan pada SPL) dan satu untuk titik $(x, y)$. Jika matriks dari berkas lebih besar daripada batas isian manual, matriks tersebut tetap dipakai untuk perhitungan, tetapi kotak isiannya tidak ditampilkan.
+\kbag{Method}
+\sig{public Matrix bacaMatriks() throws MatrixException} \kom{membaca isi kotak, menolak kotak kosong atau isian yang bukan angka}
+\sig{public void muatMatriks(Matrix m) throws MatrixException} \kom{mengisi kotak dari matriks hasil baca berkas}
+\sig{public void kosongkan()}
+\end{kelas}
+
+\begin{kelas}{LangkahPanel.java}
+\kbag{Spesifikasi}
+Satu kotak pada daftar langkah. Teks langkah dari pustaka dibaca baris demi baris; baris berbentuk \texttt{[ ... ]} dianggap sebagai baris matriks dan digambar sebagai tabel, sedangkan sisanya ditampilkan sebagai keterangan. Untuk memberi warna, matriks pada langkah ini dibandingkan dengan matriks langkah sebelumnya agar sel yang berubah dapat ditemukan, sementara nomor baris yang diubah, baris acuan, dan baris yang ditukar diambil dari keterangan langkah, misalnya ``Baris 4 = Baris 4 - (-1.5) x Baris 2''. Konsekuensinya, format teks langkah di pustaka tidak boleh diubah sembarangan karena pewarnaan di GUI bergantung pada format tersebut.
+\kbag{Method}
+\sig{public LangkahPanel(String judul, String isi, double[][] matriksSebelum, Color warnaLatar)}
+\sig{public double[][] getMatriks()} \kom{matriks pada langkah ini, dipakai sebagai pembanding langkah berikutnya}
+\end{kelas}
+
+\begin{kelas}{PlotPanel.java}
+\kbag{Spesifikasi}
+Panel grafik yang digambar sendiri melalui \texttt{paintComponent} tanpa pustaka grafik dari luar. Batas sumbu dihitung dari titik data, titik kurva, dan titik evaluasi, lalu setiap sumbu diberi lima label angka. Domain data dibagi menjadi 200 selang yang sama panjang, lalu kurva digambar sebagai garis lurus pendek antartitik sampel. Titik data digambar dengan warna merah, titik hasil evaluasi dengan warna hijau, dan posisi \textit{knot} dengan garis vertikal abu-abu. Pada tab \textit{spline}, garis vertikal ini ditaruh di setiap titik data karena setiap titik data merupakan batas segmen.
+\kbag{Method}
+\sig{public void setData(double[] xTitik, double[] yTitik, double[] xKurva, double[] yKurva, double[] knot)}
+\sig{public void tambahTitikEvaluasi(double x, double y)}
+\sig{public void kosongkan()}
+\end{kelas}
 
 \begin{figure}[H]
 \centering
-\gambarkosong{Tangkapan layar GUI (gambar/gui-utama.png)}{5cm}
-\caption{Tampilan utama GUI}
+\includegraphics[width=\textwidth]{gambar/gui-utama}
+\caption{Tampilan GUI saat pertama kali jalan}
 \label{fig:gui}
 \end{figure}
 
@@ -384,10 +452,9 @@ Apache Maven mengatur kompilasi dan pengemasan program berdasarkan berkas \textt
 
 \begin{lstlisting}
 mvn clean package
-cp target/profil2spartans-1.0-SNAPSHOT.jar bin/
+copy target\profil2spartans-1.0-SNAPSHOT.jar bin\
 java -jar bin/profil2spartans-1.0-SNAPSHOT.jar        # GUI
 java -jar bin/profil2spartans-1.0-SNAPSHOT.jar cli    # CLI
 \end{lstlisting}
-\isi{Cocokkan nama berkas .jar dan argumen dengan README final.}
 
 Perintah \texttt{mvn clean package} menghapus hasil kompilasi lama, mengompilasi seluruh kode di \texttt{src/main/java}, lalu mengemasnya ke folder \texttt{target}. Karena pustaka tidak bergantung pada dependensi luar, \texttt{.jar} yang dihasilkan juga dapat dipakai sebagai pustaka oleh program Java lain dengan menambahkannya ke \textit{classpath}.
